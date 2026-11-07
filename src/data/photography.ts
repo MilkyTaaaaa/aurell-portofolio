@@ -16,8 +16,8 @@ export const photographyAlbums: PhotographyAlbum[] = [
     images: [
         {
             imageKey: "photography/greenery",
-            alt: "Pemandangan alam hijau",
-            caption: "Pemandangan alam hijau nan kabut di perbukitan Purworejo.",
+            alt: "Greenery",
+            caption: "Nuansa Kabut Purworejo.",
             date: "2026-10-23",
             location: "Purworejo, Indonesia",
             camera: "Sony Alpha 7R III · 85mm f/1.8"
@@ -25,7 +25,7 @@ export const photographyAlbums: PhotographyAlbum[] = [
         {
             imageKey: "photography/spider-web",
             alt: "spider web",
-            caption: "Jaring laba-laba di gubuk.",
+            caption: "Jejak di Sudut Kayu",
             date: "2026-10-24",
             location: "Purworejo, Indonesia",
             camera: "Sony Alpha 7R III · 85mm f/1.8"
@@ -33,7 +33,7 @@ export const photographyAlbums: PhotographyAlbum[] = [
         {
             imageKey: "photography/scenery",
             alt: "Pemandangan alam",
-            caption: "Pemandangan Waduk Sermo dari Purworejo.",
+            caption: "Panorama Waduk Sermo, Purworejo",
             date: "2026-10-25",
             location: "Kulon Progo, Indonesia",
             camera: "Sony Alpha 7R III · 85mm f/1.8"
@@ -53,7 +53,7 @@ export const photographyAlbums: PhotographyAlbum[] = [
         {
             imageKey: "experiences/impk",
             alt: "Kegiatan IMPK",
-            caption: "Kegiatan Ilmu Medan, Peta, dan Kompas.",
+            caption: "Ilmu Medan, Peta, dan Kompas.",
             date: "2026-10-25",
             location: "Gunung Sigepak, Purworejo",
             camera: "Sony Alpha 7R III · 85mm f/1.8"
@@ -73,7 +73,7 @@ export const photographyAlbums: PhotographyAlbum[] = [
         {
             imageKey: "experiences/rescue-korban",
             alt: "Kegiatan Rescue",
-            caption: "Kegiatan rescue korban di perbukitan Menoreh.",
+            caption: "Operasi SAR & Rescue Menoreh.",
             date: "2026-10-25",
             location: "Gunung Sigepak",
             camera: "Sony Alpha 7R III · 85mm f/1.8"
@@ -81,7 +81,7 @@ export const photographyAlbums: PhotographyAlbum[] = [
         {
             imageKey: "experiences/rescue",
             alt: "Kegiatan Rescue",
-            caption: "Penyelamatan korban di mulut goa.",
+            caption: "Evakuasi Gua Menoreh.",
             date: "2026-10-25",
             location: "Watu Pecah, Purworejo",
             camera: "Sony Alpha 7R III · 85mm f/1.8"
@@ -89,7 +89,7 @@ export const photographyAlbums: PhotographyAlbum[] = [
         {
             imageKey: "experiences/long-march",
             alt: "Kegiatan Long March",
-            caption: "Kegiatan long march di perbukitan Menoreh.",
+            caption: "Navigasi darat perbukitan Menoreh.",
             date: "2026-10-25",
             location: "Gunung Sigepak",
             camera: "Sony Alpha 7R III · 85mm f/1.8"
