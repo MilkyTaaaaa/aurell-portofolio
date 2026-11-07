@@ -1,0 +1,3322 @@
+{
+  "experiences/impk": {
+    "key": "experiences/impk",
+    "originalFilename": "impk.jpeg",
+    "category": "experiences",
+    "originalWidth": 7952,
+    "originalHeight": 5304,
+    "outputWidth": 2048,
+    "outputHeight": 1366,
+    "aspectRatio": 1.4992,
+    "originalSizeBytes": 21331968,
+    "avif": [
+      {
+        "width": 480,
+        "height": 320,
+        "path": "/images/optimized/experiences/impk-480w.avif",
+        "sizeBytes": 23190
+      },
+      {
+        "width": 768,
+        "height": 512,
+        "path": "/images/optimized/experiences/impk-768w.avif",
+        "sizeBytes": 40335
+      },
+      {
+        "width": 1200,
+        "height": 800,
+        "path": "/images/optimized/experiences/impk-1200w.avif",
+        "sizeBytes": 68469
+      },
+      {
+        "width": 1600,
+        "height": 1067,
+        "path": "/images/optimized/experiences/impk-1600w.avif",
+        "sizeBytes": 96947
+      },
+      {
+        "width": 2048,
+        "height": 1366,
+        "path": "/images/optimized/experiences/impk-2048w.avif",
+        "sizeBytes": 126821
+      }
+    ],
+    "webp": [
+      {
+        "width": 480,
+        "height": 320,
+        "path": "/images/optimized/experiences/impk-480w.webp",
+        "sizeBytes": 21066
+      },
+      {
+        "width": 768,
+        "height": 512,
+        "path": "/images/optimized/experiences/impk-768w.webp",
+        "sizeBytes": 38940
+      },
+      {
+        "width": 1200,
+        "height": 800,
+        "path": "/images/optimized/experiences/impk-1200w.webp",
+        "sizeBytes": 73654
+      },
+      {
+        "width": 1600,
+        "height": 1067,
+        "path": "/images/optimized/experiences/impk-1600w.webp",
+        "sizeBytes": 103498
+      },
+      {
+        "width": 2048,
+        "height": 1366,
+        "path": "/images/optimized/experiences/impk-2048w.webp",
+        "sizeBytes": 144254
+      }
+    ],
+    "fallbackSrc": "/images/optimized/experiences/impk-2048w.webp"
+  },
+  "experiences/long-march": {
+    "key": "experiences/long-march",
+    "originalFilename": "long-march.jpeg",
+    "category": "experiences",
+    "originalWidth": 7952,
+    "originalHeight": 5304,
+    "outputWidth": 2048,
+    "outputHeight": 1366,
+    "aspectRatio": 1.4992,
+    "originalSizeBytes": 34635776,
+    "avif": [
+      {
+        "width": 480,
+        "height": 320,
+        "path": "/images/optimized/experiences/long-march-480w.avif",
+        "sizeBytes": 80211
+      },
+      {
+        "width": 768,
+        "height": 512,
+        "path": "/images/optimized/experiences/long-march-768w.avif",
+        "sizeBytes": 170646
+      },
+      {
+        "width": 1200,
+        "height": 800,
+        "path": "/images/optimized/experiences/long-march-1200w.avif",
+        "sizeBytes": 332736
+      },
+      {
+        "width": 1600,
+        "height": 1067,
+        "path": "/images/optimized/experiences/long-march-1600w.avif",
+        "sizeBytes": 535836
+      },
+      {
+        "width": 2048,
+        "height": 1366,
+        "path": "/images/optimized/experiences/long-march-2048w.avif",
+        "sizeBytes": 728552
+      }
+    ],
+    "webp": [
+      {
+        "width": 480,
+        "height": 320,
+        "path": "/images/optimized/experiences/long-march-480w.webp",
+        "sizeBytes": 61480
+      },
+      {
+        "width": 768,
+        "height": 512,
+        "path": "/images/optimized/experiences/long-march-768w.webp",
+        "sizeBytes": 133832
+      },
+      {
+        "width": 1200,
+        "height": 800,
+        "path": "/images/optimized/experiences/long-march-1200w.webp",
+        "sizeBytes": 279700
+      },
+      {
+        "width": 1600,
+        "height": 1067,
+        "path": "/images/optimized/experiences/long-march-1600w.webp",
+        "sizeBytes": 445346
+      },
+      {
+        "width": 2048,
+        "height": 1366,
+        "path": "/images/optimized/experiences/long-march-2048w.webp",
+        "sizeBytes": 628300
+      }
+    ],
+    "fallbackSrc": "/images/optimized/experiences/long-march-2048w.webp"
+  },
+  "experiences/rescue-korban": {
+    "key": "experiences/rescue-korban",
+    "originalFilename": "rescue-korban.jpeg",
+    "category": "experiences",
+    "originalWidth": 7952,
+    "originalHeight": 5304,
+    "outputWidth": 2048,
+    "outputHeight": 1366,
+    "aspectRatio": 1.4992,
+    "originalSizeBytes": 26738688,
+    "avif": [
+      {
+        "width": 480,
+        "height": 320,
+        "path": "/images/optimized/experiences/rescue-korban-480w.avif",
+        "sizeBytes": 49297
+      },
+      {
+        "width": 768,
+        "height": 512,
+        "path": "/images/optimized/experiences/rescue-korban-768w.avif",
+        "sizeBytes": 100403
+      },
+      {
+        "width": 1200,
+        "height": 800,
+        "path": "/images/optimized/experiences/rescue-korban-1200w.avif",
+        "sizeBytes": 192519
+      },
+      {
+        "width": 1600,
+        "height": 1067,
+        "path": "/images/optimized/experiences/rescue-korban-1600w.avif",
+        "sizeBytes": 293402
+      },
+      {
+        "width": 2048,
+        "height": 1366,
+        "path": "/images/optimized/experiences/rescue-korban-2048w.avif",
+        "sizeBytes": 401943
+      }
+    ],
+    "webp": [
+      {
+        "width": 480,
+        "height": 320,
+        "path": "/images/optimized/experiences/rescue-korban-480w.webp",
+        "sizeBytes": 40256
+      },
+      {
+        "width": 768,
+        "height": 512,
+        "path": "/images/optimized/experiences/rescue-korban-768w.webp",
+        "sizeBytes": 83796
+      },
+      {
+        "width": 1200,
+        "height": 800,
+        "path": "/images/optimized/experiences/rescue-korban-1200w.webp",
+        "sizeBytes": 171160
+      },
+      {
+        "width": 1600,
+        "height": 1067,
+        "path": "/images/optimized/experiences/rescue-korban-1600w.webp",
+        "sizeBytes": 270388
+      },
+      {
+        "width": 2048,
+        "height": 1366,
+        "path": "/images/optimized/experiences/rescue-korban-2048w.webp",
+        "sizeBytes": 374800
+      }
+    ],
+    "fallbackSrc": "/images/optimized/experiences/rescue-korban-2048w.webp"
+  },
+  "experiences/rescue": {
+    "key": "experiences/rescue",
+    "originalFilename": "rescue.jpeg",
+    "category": "experiences",
+    "originalWidth": 7952,
+    "originalHeight": 5304,
+    "outputWidth": 2048,
+    "outputHeight": 1366,
+    "aspectRatio": 1.4992,
+    "originalSizeBytes": 24477696,
+    "avif": [
+      {
+        "width": 480,
+        "height": 320,
+        "path": "/images/optimized/experiences/rescue-480w.avif",
+        "sizeBytes": 21318
+      },
+      {
+        "width": 768,
+        "height": 512,
+        "path": "/images/optimized/experiences/rescue-768w.avif",
+        "sizeBytes": 37866
+      },
+      {
+        "width": 1200,
+        "height": 800,
+        "path": "/images/optimized/experiences/rescue-1200w.avif",
+        "sizeBytes": 67143
+      },
+      {
+        "width": 1600,
+        "height": 1067,
+        "path": "/images/optimized/experiences/rescue-1600w.avif",
+        "sizeBytes": 98447
+      },
+      {
+        "width": 2048,
+        "height": 1366,
+        "path": "/images/optimized/experiences/rescue-2048w.avif",
+        "sizeBytes": 134688
+      }
+    ],
+    "webp": [
+      {
+        "width": 480,
+        "height": 320,
+        "path": "/images/optimized/experiences/rescue-480w.webp",
+        "sizeBytes": 19254
+      },
+      {
+        "width": 768,
+        "height": 512,
+        "path": "/images/optimized/experiences/rescue-768w.webp",
+        "sizeBytes": 35940
+      },
+      {
+        "width": 1200,
+        "height": 800,
+        "path": "/images/optimized/experiences/rescue-1200w.webp",
+        "sizeBytes": 69978
+      },
+      {
+        "width": 1600,
+        "height": 1067,
+        "path": "/images/optimized/experiences/rescue-1600w.webp",
+        "sizeBytes": 104382
+      },
+      {
+        "width": 2048,
+        "height": 1366,
+        "path": "/images/optimized/experiences/rescue-2048w.webp",
+        "sizeBytes": 147468
+      }
+    ],
+    "fallbackSrc": "/images/optimized/experiences/rescue-2048w.webp"
+  },
+  "photography/greenery": {
+    "key": "photography/greenery",
+    "originalFilename": "greenery.jpeg",
+    "category": "photography",
+    "originalWidth": 7952,
+    "originalHeight": 5304,
+    "outputWidth": 2048,
+    "outputHeight": 1366,
+    "aspectRatio": 1.4992,
+    "originalSizeBytes": 20480000,
+    "avif": [
+      {
+        "width": 480,
+        "height": 320,
+        "path": "/images/optimized/photography/greenery-480w.avif",
+        "sizeBytes": 24041
+      },
+      {
+        "width": 768,
+        "height": 512,
+        "path": "/images/optimized/photography/greenery-768w.avif",
+        "sizeBytes": 40879
+      },
+      {
+        "width": 1200,
+        "height": 800,
+        "path": "/images/optimized/photography/greenery-1200w.avif",
+        "sizeBytes": 67350
+      },
+      {
+        "width": 1600,
+        "height": 1067,
+        "path": "/images/optimized/photography/greenery-1600w.avif",
+        "sizeBytes": 92935
+      },
+      {
+        "width": 2048,
+        "height": 1366,
+        "path": "/images/optimized/photography/greenery-2048w.avif",
+        "sizeBytes": 119204
+      }
+    ],
+    "webp": [
+      {
+        "width": 480,
+        "height": 320,
+        "path": "/images/optimized/photography/greenery-480w.webp",
+        "sizeBytes": 22616
+      },
+      {
+        "width": 768,
+        "height": 512,
+        "path": "/images/optimized/photography/greenery-768w.webp",
+        "sizeBytes": 42174
+      },
+      {
+        "width": 1200,
+        "height": 800,
+        "path": "/images/optimized/photography/greenery-1200w.webp",
+        "sizeBytes": 73218
+      },
+      {
+        "width": 1600,
+        "height": 1067,
+        "path": "/images/optimized/photography/greenery-1600w.webp",
+        "sizeBytes": 107232
+      },
+      {
+        "width": 2048,
+        "height": 1366,
+        "path": "/images/optimized/photography/greenery-2048w.webp",
+        "sizeBytes": 143012
+      }
+    ],
+    "fallbackSrc": "/images/optimized/photography/greenery-2048w.webp"
+  },
+  "photography/scenery": {
+    "key": "photography/scenery",
+    "originalFilename": "scenery.jpeg",
+    "category": "photography",
+    "originalWidth": 7952,
+    "originalHeight": 5304,
+    "outputWidth": 2048,
+    "outputHeight": 1366,
+    "aspectRatio": 1.4992,
+    "originalSizeBytes": 20676608,
+    "avif": [
+      {
+        "width": 480,
+        "height": 320,
+        "path": "/images/optimized/photography/scenery-480w.avif",
+        "sizeBytes": 4016
+      },
+      {
+        "width": 768,
+        "height": 512,
+        "path": "/images/optimized/photography/scenery-768w.avif",
+        "sizeBytes": 8878
+      },
+      {
+        "width": 1200,
+        "height": 800,
+        "path": "/images/optimized/photography/scenery-1200w.avif",
+        "sizeBytes": 19659
+      },
+      {
+        "width": 1600,
+        "height": 1067,
+        "path": "/images/optimized/photography/scenery-1600w.avif",
+        "sizeBytes": 33095
+      },
+      {
+        "width": 2048,
+        "height": 1366,
+        "path": "/images/optimized/photography/scenery-2048w.avif",
+        "sizeBytes": 49240
+      }
+    ],
+    "webp": [
+      {
+        "width": 480,
+        "height": 320,
+        "path": "/images/optimized/photography/scenery-480w.webp",
+        "sizeBytes": 4780
+      },
+      {
+        "width": 768,
+        "height": 512,
+        "path": "/images/optimized/photography/scenery-768w.webp",
+        "sizeBytes": 10402
+      },
+      {
+        "width": 1200,
+        "height": 800,
+        "path": "/images/optimized/photography/scenery-1200w.webp",
+        "sizeBytes": 23212
+      },
+      {
+        "width": 1600,
+        "height": 1067,
+        "path": "/images/optimized/photography/scenery-1600w.webp",
+        "sizeBytes": 39540
+      },
+      {
+        "width": 2048,
+        "height": 1366,
+        "path": "/images/optimized/photography/scenery-2048w.webp",
+        "sizeBytes": 59888
+      }
+    ],
+    "fallbackSrc": "/images/optimized/photography/scenery-2048w.webp"
+  },
+  "photography/spider-web": {
+    "key": "photography/spider-web",
+    "originalFilename": "spider-web.jpeg",
+    "category": "photography",
+    "originalWidth": 7952,
+    "originalHeight": 5304,
+    "outputWidth": 2048,
+    "outputHeight": 1366,
+    "aspectRatio": 1.4992,
+    "originalSizeBytes": 25460736,
+    "avif": [
+      {
+        "width": 480,
+        "height": 320,
+        "path": "/images/optimized/photography/spider-web-480w.avif",
+        "sizeBytes": 10334
+      },
+      {
+        "width": 768,
+        "height": 512,
+        "path": "/images/optimized/photography/spider-web-768w.avif",
+        "sizeBytes": 21917
+      },
+      {
+        "width": 1200,
+        "height": 800,
+        "path": "/images/optimized/photography/spider-web-1200w.avif",
+        "sizeBytes": 44738
+      },
+      {
+        "width": 1600,
+        "height": 1067,
+        "path": "/images/optimized/photography/spider-web-1600w.avif",
+        "sizeBytes": 71457
+      },
+      {
+        "width": 2048,
+        "height": 1366,
+        "path": "/images/optimized/photography/spider-web-2048w.avif",
+        "sizeBytes": 104579
+      }
+    ],
+    "webp": [
+      {
+        "width": 480,
+        "height": 320,
+        "path": "/images/optimized/photography/spider-web-480w.webp",
+        "sizeBytes": 10592
+      },
+      {
+        "width": 768,
+        "height": 512,
+        "path": "/images/optimized/photography/spider-web-768w.webp",
+        "sizeBytes": 22382
+      },
+      {
+        "width": 1200,
+        "height": 800,
+        "path": "/images/optimized/photography/spider-web-1200w.webp",
+        "sizeBytes": 47312
+      },
+      {
+        "width": 1600,
+        "height": 1067,
+        "path": "/images/optimized/photography/spider-web-1600w.webp",
+        "sizeBytes": 77188
+      },
+      {
+        "width": 2048,
+        "height": 1366,
+        "path": "/images/optimized/photography/spider-web-2048w.webp",
+        "sizeBytes": 115884
+      }
+    ],
+    "fallbackSrc": "/images/optimized/photography/spider-web-2048w.webp"
+  },
+  "profile/profile": {
+    "key": "profile/profile",
+    "originalFilename": "profile.png",
+    "category": "profile",
+    "originalWidth": 1086,
+    "originalHeight": 1448,
+    "outputWidth": 1086,
+    "outputHeight": 1448,
+    "aspectRatio": 0.75,
+    "originalSizeBytes": 1333365,
+    "avif": [
+      {
+        "width": 480,
+        "height": 640,
+        "path": "/images/optimized/profile/profile-480w.avif",
+        "sizeBytes": 8457
+      },
+      {
+        "width": 768,
+        "height": 1024,
+        "path": "/images/optimized/profile/profile-768w.avif",
+        "sizeBytes": 17899
+      },
+      {
+        "width": 1086,
+        "height": 1448,
+        "path": "/images/optimized/profile/profile-1086w.avif",
+        "sizeBytes": 27936
+      }
+    ],
+    "webp": [
+      {
+        "width": 480,
+        "height": 640,
+        "path": "/images/optimized/profile/profile-480w.webp",
+        "sizeBytes": 8760
+      },
+      {
+        "width": 768,
+        "height": 1024,
+        "path": "/images/optimized/profile/profile-768w.webp",
+        "sizeBytes": 19124
+      },
+      {
+        "width": 1086,
+        "height": 1448,
+        "path": "/images/optimized/profile/profile-1086w.webp",
+        "sizeBytes": 31958
+      }
+    ],
+    "fallbackSrc": "/images/optimized/profile/profile-1086w.webp"
+  },
+  "projects/bioloop-ax/thumbnail": {
+    "key": "projects/bioloop-ax/thumbnail",
+    "originalFilename": "thumbnail.jpg",
+    "category": "projects",
+    "originalWidth": 2752,
+    "originalHeight": 1536,
+    "outputWidth": 2048,
+    "outputHeight": 1143,
+    "aspectRatio": 1.7917,
+    "originalSizeBytes": 1157875,
+    "avif": [
+      {
+        "width": 480,
+        "height": 268,
+        "path": "/images/optimized/projects/bioloop-ax/thumbnail-480w.avif",
+        "sizeBytes": 3396
+      },
+      {
+        "width": 768,
+        "height": 429,
+        "path": "/images/optimized/projects/bioloop-ax/thumbnail-768w.avif",
+        "sizeBytes": 5199
+      },
+      {
+        "width": 1200,
+        "height": 670,
+        "path": "/images/optimized/projects/bioloop-ax/thumbnail-1200w.avif",
+        "sizeBytes": 8075
+      },
+      {
+        "width": 1600,
+        "height": 893,
+        "path": "/images/optimized/projects/bioloop-ax/thumbnail-1600w.avif",
+        "sizeBytes": 10515
+      },
+      {
+        "width": 2048,
+        "height": 1143,
+        "path": "/images/optimized/projects/bioloop-ax/thumbnail-2048w.avif",
+        "sizeBytes": 13290
+      }
+    ],
+    "webp": [
+      {
+        "width": 480,
+        "height": 268,
+        "path": "/images/optimized/projects/bioloop-ax/thumbnail-480w.webp",
+        "sizeBytes": 4360
+      },
+      {
+        "width": 768,
+        "height": 429,
+        "path": "/images/optimized/projects/bioloop-ax/thumbnail-768w.webp",
+        "sizeBytes": 7176
+      },
+      {
+        "width": 1200,
+        "height": 670,
+        "path": "/images/optimized/projects/bioloop-ax/thumbnail-1200w.webp",
+        "sizeBytes": 12616
+      },
+      {
+        "width": 1600,
+        "height": 893,
+        "path": "/images/optimized/projects/bioloop-ax/thumbnail-1600w.webp",
+        "sizeBytes": 18744
+      },
+      {
+        "width": 2048,
+        "height": 1143,
+        "path": "/images/optimized/projects/bioloop-ax/thumbnail-2048w.webp",
+        "sizeBytes": 26102
+      }
+    ],
+    "fallbackSrc": "/images/optimized/projects/bioloop-ax/thumbnail-2048w.webp"
+  },
+  "projects/gi-presensi/thumbnail": {
+    "key": "projects/gi-presensi/thumbnail",
+    "originalFilename": "thumbnail.jpg",
+    "category": "projects",
+    "originalWidth": 2752,
+    "originalHeight": 1536,
+    "outputWidth": 2048,
+    "outputHeight": 1143,
+    "aspectRatio": 1.7917,
+    "originalSizeBytes": 1333196,
+    "avif": [
+      {
+        "width": 480,
+        "height": 268,
+        "path": "/images/optimized/projects/gi-presensi/thumbnail-480w.avif",
+        "sizeBytes": 5279
+      },
+      {
+        "width": 768,
+        "height": 429,
+        "path": "/images/optimized/projects/gi-presensi/thumbnail-768w.avif",
+        "sizeBytes": 8612
+      },
+      {
+        "width": 1200,
+        "height": 670,
+        "path": "/images/optimized/projects/gi-presensi/thumbnail-1200w.avif",
+        "sizeBytes": 12836
+      },
+      {
+        "width": 1600,
+        "height": 893,
+        "path": "/images/optimized/projects/gi-presensi/thumbnail-1600w.avif",
+        "sizeBytes": 16477
+      },
+      {
+        "width": 2048,
+        "height": 1143,
+        "path": "/images/optimized/projects/gi-presensi/thumbnail-2048w.avif",
+        "sizeBytes": 19854
+      }
+    ],
+    "webp": [
+      {
+        "width": 480,
+        "height": 268,
+        "path": "/images/optimized/projects/gi-presensi/thumbnail-480w.webp",
+        "sizeBytes": 6424
+      },
+      {
+        "width": 768,
+        "height": 429,
+        "path": "/images/optimized/projects/gi-presensi/thumbnail-768w.webp",
+        "sizeBytes": 11190
+      },
+      {
+        "width": 1200,
+        "height": 670,
+        "path": "/images/optimized/projects/gi-presensi/thumbnail-1200w.webp",
+        "sizeBytes": 18028
+      },
+      {
+        "width": 1600,
+        "height": 893,
+        "path": "/images/optimized/projects/gi-presensi/thumbnail-1600w.webp",
+        "sizeBytes": 25546
+      },
+      {
+        "width": 2048,
+        "height": 1143,
+        "path": "/images/optimized/projects/gi-presensi/thumbnail-2048w.webp",
+        "sizeBytes": 34274
+      }
+    ],
+    "fallbackSrc": "/images/optimized/projects/gi-presensi/thumbnail-2048w.webp"
+  },
+  "projects/marbotfx/thumbnail": {
+    "key": "projects/marbotfx/thumbnail",
+    "originalFilename": "thumbnail.jpg",
+    "category": "projects",
+    "originalWidth": 2752,
+    "originalHeight": 1536,
+    "outputWidth": 2048,
+    "outputHeight": 1143,
+    "aspectRatio": 1.7917,
+    "originalSizeBytes": 1213626,
+    "avif": [
+      {
+        "width": 480,
+        "height": 268,
+        "path": "/images/optimized/projects/marbotfx/thumbnail-480w.avif",
+        "sizeBytes": 2936
+      },
+      {
+        "width": 768,
+        "height": 429,
+        "path": "/images/optimized/projects/marbotfx/thumbnail-768w.avif",
+        "sizeBytes": 4500
+      },
+      {
+        "width": 1200,
+        "height": 670,
+        "path": "/images/optimized/projects/marbotfx/thumbnail-1200w.avif",
+        "sizeBytes": 6965
+      },
+      {
+        "width": 1600,
+        "height": 893,
+        "path": "/images/optimized/projects/marbotfx/thumbnail-1600w.avif",
+        "sizeBytes": 8852
+      },
+      {
+        "width": 2048,
+        "height": 1143,
+        "path": "/images/optimized/projects/marbotfx/thumbnail-2048w.avif",
+        "sizeBytes": 11680
+      }
+    ],
+    "webp": [
+      {
+        "width": 480,
+        "height": 268,
+        "path": "/images/optimized/projects/marbotfx/thumbnail-480w.webp",
+        "sizeBytes": 3444
+      },
+      {
+        "width": 768,
+        "height": 429,
+        "path": "/images/optimized/projects/marbotfx/thumbnail-768w.webp",
+        "sizeBytes": 5712
+      },
+      {
+        "width": 1200,
+        "height": 670,
+        "path": "/images/optimized/projects/marbotfx/thumbnail-1200w.webp",
+        "sizeBytes": 9640
+      },
+      {
+        "width": 1600,
+        "height": 893,
+        "path": "/images/optimized/projects/marbotfx/thumbnail-1600w.webp",
+        "sizeBytes": 13286
+      },
+      {
+        "width": 2048,
+        "height": 1143,
+        "path": "/images/optimized/projects/marbotfx/thumbnail-2048w.webp",
+        "sizeBytes": 19000
+      }
+    ],
+    "fallbackSrc": "/images/optimized/projects/marbotfx/thumbnail-2048w.webp"
+  },
+  "projects/panenin/thumbnail": {
+    "key": "projects/panenin/thumbnail",
+    "originalFilename": "thumbnail.png",
+    "category": "projects",
+    "originalWidth": 500,
+    "originalHeight": 272,
+    "outputWidth": 500,
+    "outputHeight": 272,
+    "aspectRatio": 1.8382,
+    "originalSizeBytes": 34204,
+    "avif": [
+      {
+        "width": 480,
+        "height": 261,
+        "path": "/images/optimized/projects/panenin/thumbnail-480w.avif",
+        "sizeBytes": 8309
+      },
+      {
+        "width": 500,
+        "height": 272,
+        "path": "/images/optimized/projects/panenin/thumbnail-500w.avif",
+        "sizeBytes": 7668
+      }
+    ],
+    "webp": [
+      {
+        "width": 480,
+        "height": 261,
+        "path": "/images/optimized/projects/panenin/thumbnail-480w.webp",
+        "sizeBytes": 6654
+      },
+      {
+        "width": 500,
+        "height": 272,
+        "path": "/images/optimized/projects/panenin/thumbnail-500w.webp",
+        "sizeBytes": 7092
+      }
+    ],
+    "fallbackSrc": "/images/optimized/projects/panenin/thumbnail-500w.webp"
+  },
+  "projects/simonika/thumbnail": {
+    "key": "projects/simonika/thumbnail",
+    "originalFilename": "thumbnail.jpg",
+    "category": "projects",
+    "originalWidth": 2752,
+    "originalHeight": 1536,
+    "outputWidth": 2048,
+    "outputHeight": 1143,
+    "aspectRatio": 1.7917,
+    "originalSizeBytes": 1160174,
+    "avif": [
+      {
+        "width": 480,
+        "height": 268,
+        "path": "/images/optimized/projects/simonika/thumbnail-480w.avif",
+        "sizeBytes": 6848
+      },
+      {
+        "width": 768,
+        "height": 429,
+        "path": "/images/optimized/projects/simonika/thumbnail-768w.avif",
+        "sizeBytes": 11842
+      },
+      {
+        "width": 1200,
+        "height": 670,
+        "path": "/images/optimized/projects/simonika/thumbnail-1200w.avif",
+        "sizeBytes": 19988
+      },
+      {
+        "width": 1600,
+        "height": 893,
+        "path": "/images/optimized/projects/simonika/thumbnail-1600w.avif",
+        "sizeBytes": 27201
+      },
+      {
+        "width": 2048,
+        "height": 1143,
+        "path": "/images/optimized/projects/simonika/thumbnail-2048w.avif",
+        "sizeBytes": 34973
+      }
+    ],
+    "webp": [
+      {
+        "width": 480,
+        "height": 268,
+        "path": "/images/optimized/projects/simonika/thumbnail-480w.webp",
+        "sizeBytes": 7050
+      },
+      {
+        "width": 768,
+        "height": 429,
+        "path": "/images/optimized/projects/simonika/thumbnail-768w.webp",
+        "sizeBytes": 13042
+      },
+      {
+        "width": 1200,
+        "height": 670,
+        "path": "/images/optimized/projects/simonika/thumbnail-1200w.webp",
+        "sizeBytes": 23926
+      },
+      {
+        "width": 1600,
+        "height": 893,
+        "path": "/images/optimized/projects/simonika/thumbnail-1600w.webp",
+        "sizeBytes": 34616
+      },
+      {
+        "width": 2048,
+        "height": 1143,
+        "path": "/images/optimized/projects/simonika/thumbnail-2048w.webp",
+        "sizeBytes": 48362
+      }
+    ],
+    "fallbackSrc": "/images/optimized/projects/simonika/thumbnail-2048w.webp"
+  },
+  "social-media/assessment/1": {
+    "key": "social-media/assessment/1",
+    "originalFilename": "1.png",
+    "category": "social-media",
+    "originalWidth": 1080,
+    "originalHeight": 1350,
+    "outputWidth": 1080,
+    "outputHeight": 1350,
+    "aspectRatio": 0.8,
+    "originalSizeBytes": 1812254,
+    "avif": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/assessment/1-480w.avif",
+        "sizeBytes": 52681
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/assessment/1-768w.avif",
+        "sizeBytes": 107093
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/assessment/1-1080w.avif",
+        "sizeBytes": 173257
+      }
+    ],
+    "webp": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/assessment/1-480w.webp",
+        "sizeBytes": 57864
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/assessment/1-768w.webp",
+        "sizeBytes": 122750
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/assessment/1-1080w.webp",
+        "sizeBytes": 207766
+      }
+    ],
+    "fallbackSrc": "/images/optimized/social-media/assessment/1-1080w.webp"
+  },
+  "social-media/assessment/2": {
+    "key": "social-media/assessment/2",
+    "originalFilename": "2.png",
+    "category": "social-media",
+    "originalWidth": 1080,
+    "originalHeight": 1350,
+    "outputWidth": 1080,
+    "outputHeight": 1350,
+    "aspectRatio": 0.8,
+    "originalSizeBytes": 3133106,
+    "avif": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/assessment/2-480w.avif",
+        "sizeBytes": 89790
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/assessment/2-768w.avif",
+        "sizeBytes": 210290
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/assessment/2-1080w.avif",
+        "sizeBytes": 403964
+      }
+    ],
+    "webp": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/assessment/2-480w.webp",
+        "sizeBytes": 92308
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/assessment/2-768w.webp",
+        "sizeBytes": 216270
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/assessment/2-1080w.webp",
+        "sizeBytes": 417724
+      }
+    ],
+    "fallbackSrc": "/images/optimized/social-media/assessment/2-1080w.webp"
+  },
+  "social-media/assessment/3": {
+    "key": "social-media/assessment/3",
+    "originalFilename": "3.png",
+    "category": "social-media",
+    "originalWidth": 1080,
+    "originalHeight": 1350,
+    "outputWidth": 1080,
+    "outputHeight": 1350,
+    "aspectRatio": 0.8,
+    "originalSizeBytes": 1995228,
+    "avif": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/assessment/3-480w.avif",
+        "sizeBytes": 42261
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/assessment/3-768w.avif",
+        "sizeBytes": 74687
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/assessment/3-1080w.avif",
+        "sizeBytes": 112564
+      }
+    ],
+    "webp": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/assessment/3-480w.webp",
+        "sizeBytes": 45530
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/assessment/3-768w.webp",
+        "sizeBytes": 86502
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/assessment/3-1080w.webp",
+        "sizeBytes": 142178
+      }
+    ],
+    "fallbackSrc": "/images/optimized/social-media/assessment/3-1080w.webp"
+  },
+  "social-media/assessment/4": {
+    "key": "social-media/assessment/4",
+    "originalFilename": "4.png",
+    "category": "social-media",
+    "originalWidth": 1080,
+    "originalHeight": 1350,
+    "outputWidth": 1080,
+    "outputHeight": 1350,
+    "aspectRatio": 0.8,
+    "originalSizeBytes": 3103837,
+    "avif": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/assessment/4-480w.avif",
+        "sizeBytes": 88352
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/assessment/4-768w.avif",
+        "sizeBytes": 206732
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/assessment/4-1080w.avif",
+        "sizeBytes": 400649
+      }
+    ],
+    "webp": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/assessment/4-480w.webp",
+        "sizeBytes": 82514
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/assessment/4-768w.webp",
+        "sizeBytes": 201272
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/assessment/4-1080w.webp",
+        "sizeBytes": 395428
+      }
+    ],
+    "fallbackSrc": "/images/optimized/social-media/assessment/4-1080w.webp"
+  },
+  "social-media/assessment/5": {
+    "key": "social-media/assessment/5",
+    "originalFilename": "5.png",
+    "category": "social-media",
+    "originalWidth": 1080,
+    "originalHeight": 1350,
+    "outputWidth": 1080,
+    "outputHeight": 1350,
+    "aspectRatio": 0.8,
+    "originalSizeBytes": 2669506,
+    "avif": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/assessment/5-480w.avif",
+        "sizeBytes": 85652
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/assessment/5-768w.avif",
+        "sizeBytes": 182238
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/assessment/5-1080w.avif",
+        "sizeBytes": 329433
+      }
+    ],
+    "webp": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/assessment/5-480w.webp",
+        "sizeBytes": 84822
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/assessment/5-768w.webp",
+        "sizeBytes": 184044
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/assessment/5-1080w.webp",
+        "sizeBytes": 338050
+      }
+    ],
+    "fallbackSrc": "/images/optimized/social-media/assessment/5-1080w.webp"
+  },
+  "social-media/assessment/6": {
+    "key": "social-media/assessment/6",
+    "originalFilename": "6.png",
+    "category": "social-media",
+    "originalWidth": 1080,
+    "originalHeight": 1350,
+    "outputWidth": 1080,
+    "outputHeight": 1350,
+    "aspectRatio": 0.8,
+    "originalSizeBytes": 2752372,
+    "avif": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/assessment/6-480w.avif",
+        "sizeBytes": 62273
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/assessment/6-768w.avif",
+        "sizeBytes": 135848
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/assessment/6-1080w.avif",
+        "sizeBytes": 250705
+      }
+    ],
+    "webp": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/assessment/6-480w.webp",
+        "sizeBytes": 68664
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/assessment/6-768w.webp",
+        "sizeBytes": 150748
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/assessment/6-1080w.webp",
+        "sizeBytes": 284150
+      }
+    ],
+    "fallbackSrc": "/images/optimized/social-media/assessment/6-1080w.webp"
+  },
+  "social-media/assessment/7": {
+    "key": "social-media/assessment/7",
+    "originalFilename": "7.png",
+    "category": "social-media",
+    "originalWidth": 1080,
+    "originalHeight": 1350,
+    "outputWidth": 1080,
+    "outputHeight": 1350,
+    "aspectRatio": 0.8,
+    "originalSizeBytes": 2417330,
+    "avif": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/assessment/7-480w.avif",
+        "sizeBytes": 69607
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/assessment/7-768w.avif",
+        "sizeBytes": 153784
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/assessment/7-1080w.avif",
+        "sizeBytes": 283960
+      }
+    ],
+    "webp": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/assessment/7-480w.webp",
+        "sizeBytes": 73604
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/assessment/7-768w.webp",
+        "sizeBytes": 165364
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/assessment/7-1080w.webp",
+        "sizeBytes": 306328
+      }
+    ],
+    "fallbackSrc": "/images/optimized/social-media/assessment/7-1080w.webp"
+  },
+  "social-media/assessment/8": {
+    "key": "social-media/assessment/8",
+    "originalFilename": "8.png",
+    "category": "social-media",
+    "originalWidth": 1080,
+    "originalHeight": 1350,
+    "outputWidth": 1080,
+    "outputHeight": 1350,
+    "aspectRatio": 0.8,
+    "originalSizeBytes": 2527159,
+    "avif": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/assessment/8-480w.avif",
+        "sizeBytes": 58918
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/assessment/8-768w.avif",
+        "sizeBytes": 136110
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/assessment/8-1080w.avif",
+        "sizeBytes": 266604
+      }
+    ],
+    "webp": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/assessment/8-480w.webp",
+        "sizeBytes": 57778
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/assessment/8-768w.webp",
+        "sizeBytes": 135422
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/assessment/8-1080w.webp",
+        "sizeBytes": 269948
+      }
+    ],
+    "fallbackSrc": "/images/optimized/social-media/assessment/8-1080w.webp"
+  },
+  "social-media/fun-orad/1": {
+    "key": "social-media/fun-orad/1",
+    "originalFilename": "1.PNG",
+    "category": "social-media",
+    "originalWidth": 1170,
+    "originalHeight": 1460,
+    "outputWidth": 1170,
+    "outputHeight": 1460,
+    "aspectRatio": 0.8014,
+    "originalSizeBytes": 432787,
+    "avif": [
+      {
+        "width": 480,
+        "height": 599,
+        "path": "/images/optimized/social-media/fun-orad/1-480w.avif",
+        "sizeBytes": 92207
+      },
+      {
+        "width": 768,
+        "height": 958,
+        "path": "/images/optimized/social-media/fun-orad/1-768w.avif",
+        "sizeBytes": 160754
+      },
+      {
+        "width": 1170,
+        "height": 1460,
+        "path": "/images/optimized/social-media/fun-orad/1-1170w.avif",
+        "sizeBytes": 262833
+      }
+    ],
+    "webp": [
+      {
+        "width": 480,
+        "height": 599,
+        "path": "/images/optimized/social-media/fun-orad/1-480w.webp",
+        "sizeBytes": 96822
+      },
+      {
+        "width": 768,
+        "height": 958,
+        "path": "/images/optimized/social-media/fun-orad/1-768w.webp",
+        "sizeBytes": 183888
+      },
+      {
+        "width": 1170,
+        "height": 1460,
+        "path": "/images/optimized/social-media/fun-orad/1-1170w.webp",
+        "sizeBytes": 300548
+      }
+    ],
+    "fallbackSrc": "/images/optimized/social-media/fun-orad/1-1170w.webp"
+  },
+  "social-media/fun-orad/10": {
+    "key": "social-media/fun-orad/10",
+    "originalFilename": "10.png",
+    "category": "social-media",
+    "originalWidth": 1080,
+    "originalHeight": 1350,
+    "outputWidth": 1080,
+    "outputHeight": 1350,
+    "aspectRatio": 0.8,
+    "originalSizeBytes": 2742148,
+    "avif": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/fun-orad/10-480w.avif",
+        "sizeBytes": 102228
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/fun-orad/10-768w.avif",
+        "sizeBytes": 211063
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/fun-orad/10-1080w.avif",
+        "sizeBytes": 373917
+      }
+    ],
+    "webp": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/fun-orad/10-480w.webp",
+        "sizeBytes": 89562
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/fun-orad/10-768w.webp",
+        "sizeBytes": 197932
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/fun-orad/10-1080w.webp",
+        "sizeBytes": 350910
+      }
+    ],
+    "fallbackSrc": "/images/optimized/social-media/fun-orad/10-1080w.webp"
+  },
+  "social-media/fun-orad/2": {
+    "key": "social-media/fun-orad/2",
+    "originalFilename": "2.png",
+    "category": "social-media",
+    "originalWidth": 1080,
+    "originalHeight": 1350,
+    "outputWidth": 1080,
+    "outputHeight": 1350,
+    "aspectRatio": 0.8,
+    "originalSizeBytes": 2288986,
+    "avif": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/fun-orad/2-480w.avif",
+        "sizeBytes": 67040
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/fun-orad/2-768w.avif",
+        "sizeBytes": 130053
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/fun-orad/2-1080w.avif",
+        "sizeBytes": 200752
+      }
+    ],
+    "webp": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/fun-orad/2-480w.webp",
+        "sizeBytes": 68276
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/fun-orad/2-768w.webp",
+        "sizeBytes": 143004
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/fun-orad/2-1080w.webp",
+        "sizeBytes": 237270
+      }
+    ],
+    "fallbackSrc": "/images/optimized/social-media/fun-orad/2-1080w.webp"
+  },
+  "social-media/fun-orad/3": {
+    "key": "social-media/fun-orad/3",
+    "originalFilename": "3.png",
+    "category": "social-media",
+    "originalWidth": 1080,
+    "originalHeight": 1350,
+    "outputWidth": 1080,
+    "outputHeight": 1350,
+    "aspectRatio": 0.8,
+    "originalSizeBytes": 2157990,
+    "avif": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/fun-orad/3-480w.avif",
+        "sizeBytes": 60150
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/fun-orad/3-768w.avif",
+        "sizeBytes": 118484
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/fun-orad/3-1080w.avif",
+        "sizeBytes": 185741
+      }
+    ],
+    "webp": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/fun-orad/3-480w.webp",
+        "sizeBytes": 59772
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/fun-orad/3-768w.webp",
+        "sizeBytes": 125840
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/fun-orad/3-1080w.webp",
+        "sizeBytes": 205958
+      }
+    ],
+    "fallbackSrc": "/images/optimized/social-media/fun-orad/3-1080w.webp"
+  },
+  "social-media/fun-orad/4": {
+    "key": "social-media/fun-orad/4",
+    "originalFilename": "4.png",
+    "category": "social-media",
+    "originalWidth": 1080,
+    "originalHeight": 1350,
+    "outputWidth": 1080,
+    "outputHeight": 1350,
+    "aspectRatio": 0.8,
+    "originalSizeBytes": 2679492,
+    "avif": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/fun-orad/4-480w.avif",
+        "sizeBytes": 92035
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/fun-orad/4-768w.avif",
+        "sizeBytes": 195373
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/fun-orad/4-1080w.avif",
+        "sizeBytes": 340502
+      }
+    ],
+    "webp": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/fun-orad/4-480w.webp",
+        "sizeBytes": 82212
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/fun-orad/4-768w.webp",
+        "sizeBytes": 183046
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/fun-orad/4-1080w.webp",
+        "sizeBytes": 330158
+      }
+    ],
+    "fallbackSrc": "/images/optimized/social-media/fun-orad/4-1080w.webp"
+  },
+  "social-media/fun-orad/5": {
+    "key": "social-media/fun-orad/5",
+    "originalFilename": "5.png",
+    "category": "social-media",
+    "originalWidth": 1080,
+    "originalHeight": 1350,
+    "outputWidth": 1080,
+    "outputHeight": 1350,
+    "aspectRatio": 0.8,
+    "originalSizeBytes": 2139361,
+    "avif": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/fun-orad/5-480w.avif",
+        "sizeBytes": 53514
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/fun-orad/5-768w.avif",
+        "sizeBytes": 111471
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/fun-orad/5-1080w.avif",
+        "sizeBytes": 187289
+      }
+    ],
+    "webp": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/fun-orad/5-480w.webp",
+        "sizeBytes": 55336
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/fun-orad/5-768w.webp",
+        "sizeBytes": 119750
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/fun-orad/5-1080w.webp",
+        "sizeBytes": 206422
+      }
+    ],
+    "fallbackSrc": "/images/optimized/social-media/fun-orad/5-1080w.webp"
+  },
+  "social-media/fun-orad/6": {
+    "key": "social-media/fun-orad/6",
+    "originalFilename": "6.png",
+    "category": "social-media",
+    "originalWidth": 1080,
+    "originalHeight": 1350,
+    "outputWidth": 1080,
+    "outputHeight": 1350,
+    "aspectRatio": 0.8,
+    "originalSizeBytes": 3013154,
+    "avif": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/fun-orad/6-480w.avif",
+        "sizeBytes": 91308
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/fun-orad/6-768w.avif",
+        "sizeBytes": 205136
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/fun-orad/6-1080w.avif",
+        "sizeBytes": 385998
+      }
+    ],
+    "webp": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/fun-orad/6-480w.webp",
+        "sizeBytes": 89450
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/fun-orad/6-768w.webp",
+        "sizeBytes": 198684
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/fun-orad/6-1080w.webp",
+        "sizeBytes": 379820
+      }
+    ],
+    "fallbackSrc": "/images/optimized/social-media/fun-orad/6-1080w.webp"
+  },
+  "social-media/fun-orad/7": {
+    "key": "social-media/fun-orad/7",
+    "originalFilename": "7.png",
+    "category": "social-media",
+    "originalWidth": 1080,
+    "originalHeight": 1350,
+    "outputWidth": 1080,
+    "outputHeight": 1350,
+    "aspectRatio": 0.8,
+    "originalSizeBytes": 2931697,
+    "avif": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/fun-orad/7-480w.avif",
+        "sizeBytes": 81381
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/fun-orad/7-768w.avif",
+        "sizeBytes": 177073
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/fun-orad/7-1080w.avif",
+        "sizeBytes": 318777
+      }
+    ],
+    "webp": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/fun-orad/7-480w.webp",
+        "sizeBytes": 79918
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/fun-orad/7-768w.webp",
+        "sizeBytes": 179376
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/fun-orad/7-1080w.webp",
+        "sizeBytes": 330672
+      }
+    ],
+    "fallbackSrc": "/images/optimized/social-media/fun-orad/7-1080w.webp"
+  },
+  "social-media/fun-orad/8": {
+    "key": "social-media/fun-orad/8",
+    "originalFilename": "8.png",
+    "category": "social-media",
+    "originalWidth": 1080,
+    "originalHeight": 1350,
+    "outputWidth": 1080,
+    "outputHeight": 1350,
+    "aspectRatio": 0.8,
+    "originalSizeBytes": 2982131,
+    "avif": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/fun-orad/8-480w.avif",
+        "sizeBytes": 107571
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/fun-orad/8-768w.avif",
+        "sizeBytes": 222181
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/fun-orad/8-1080w.avif",
+        "sizeBytes": 368137
+      }
+    ],
+    "webp": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/fun-orad/8-480w.webp",
+        "sizeBytes": 99132
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/fun-orad/8-768w.webp",
+        "sizeBytes": 221358
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/fun-orad/8-1080w.webp",
+        "sizeBytes": 375842
+      }
+    ],
+    "fallbackSrc": "/images/optimized/social-media/fun-orad/8-1080w.webp"
+  },
+  "social-media/fun-orad/9": {
+    "key": "social-media/fun-orad/9",
+    "originalFilename": "9.png",
+    "category": "social-media",
+    "originalWidth": 1080,
+    "originalHeight": 1350,
+    "outputWidth": 1080,
+    "outputHeight": 1350,
+    "aspectRatio": 0.8,
+    "originalSizeBytes": 2721265,
+    "avif": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/fun-orad/9-480w.avif",
+        "sizeBytes": 88391
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/fun-orad/9-768w.avif",
+        "sizeBytes": 172885
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/fun-orad/9-1080w.avif",
+        "sizeBytes": 274881
+      }
+    ],
+    "webp": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/fun-orad/9-480w.webp",
+        "sizeBytes": 82248
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/fun-orad/9-768w.webp",
+        "sizeBytes": 169208
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/fun-orad/9-1080w.webp",
+        "sizeBytes": 290570
+      }
+    ],
+    "fallbackSrc": "/images/optimized/social-media/fun-orad/9-1080w.webp"
+  },
+  "social-media/gunung-hutan-1/1": {
+    "key": "social-media/gunung-hutan-1/1",
+    "originalFilename": "1.png",
+    "category": "social-media",
+    "originalWidth": 1080,
+    "originalHeight": 1350,
+    "outputWidth": 1080,
+    "outputHeight": 1350,
+    "aspectRatio": 0.8,
+    "originalSizeBytes": 2102440,
+    "avif": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/gunung-hutan-1/1-480w.avif",
+        "sizeBytes": 43894
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/gunung-hutan-1/1-768w.avif",
+        "sizeBytes": 80409
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/gunung-hutan-1/1-1080w.avif",
+        "sizeBytes": 121299
+      }
+    ],
+    "webp": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/gunung-hutan-1/1-480w.webp",
+        "sizeBytes": 48402
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/gunung-hutan-1/1-768w.webp",
+        "sizeBytes": 95898
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/gunung-hutan-1/1-1080w.webp",
+        "sizeBytes": 149994
+      }
+    ],
+    "fallbackSrc": "/images/optimized/social-media/gunung-hutan-1/1-1080w.webp"
+  },
+  "social-media/gunung-hutan-1/2": {
+    "key": "social-media/gunung-hutan-1/2",
+    "originalFilename": "2.png",
+    "category": "social-media",
+    "originalWidth": 1080,
+    "originalHeight": 1350,
+    "outputWidth": 1080,
+    "outputHeight": 1350,
+    "aspectRatio": 0.8,
+    "originalSizeBytes": 2413066,
+    "avif": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/gunung-hutan-1/2-480w.avif",
+        "sizeBytes": 53263
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/gunung-hutan-1/2-768w.avif",
+        "sizeBytes": 99025
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/gunung-hutan-1/2-1080w.avif",
+        "sizeBytes": 154821
+      }
+    ],
+    "webp": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/gunung-hutan-1/2-480w.webp",
+        "sizeBytes": 57290
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/gunung-hutan-1/2-768w.webp",
+        "sizeBytes": 110766
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/gunung-hutan-1/2-1080w.webp",
+        "sizeBytes": 181644
+      }
+    ],
+    "fallbackSrc": "/images/optimized/social-media/gunung-hutan-1/2-1080w.webp"
+  },
+  "social-media/gunung-hutan-1/3": {
+    "key": "social-media/gunung-hutan-1/3",
+    "originalFilename": "3.png",
+    "category": "social-media",
+    "originalWidth": 1080,
+    "originalHeight": 1350,
+    "outputWidth": 1080,
+    "outputHeight": 1350,
+    "aspectRatio": 0.8,
+    "originalSizeBytes": 2136557,
+    "avif": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/gunung-hutan-1/3-480w.avif",
+        "sizeBytes": 41095
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/gunung-hutan-1/3-768w.avif",
+        "sizeBytes": 79958
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/gunung-hutan-1/3-1080w.avif",
+        "sizeBytes": 124160
+      }
+    ],
+    "webp": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/gunung-hutan-1/3-480w.webp",
+        "sizeBytes": 46894
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/gunung-hutan-1/3-768w.webp",
+        "sizeBytes": 95800
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/gunung-hutan-1/3-1080w.webp",
+        "sizeBytes": 153430
+      }
+    ],
+    "fallbackSrc": "/images/optimized/social-media/gunung-hutan-1/3-1080w.webp"
+  },
+  "social-media/gunung-hutan-1/4": {
+    "key": "social-media/gunung-hutan-1/4",
+    "originalFilename": "4.png",
+    "category": "social-media",
+    "originalWidth": 1080,
+    "originalHeight": 1350,
+    "outputWidth": 1080,
+    "outputHeight": 1350,
+    "aspectRatio": 0.8,
+    "originalSizeBytes": 2442939,
+    "avif": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/gunung-hutan-1/4-480w.avif",
+        "sizeBytes": 73054
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/gunung-hutan-1/4-768w.avif",
+        "sizeBytes": 140042
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/gunung-hutan-1/4-1080w.avif",
+        "sizeBytes": 217612
+      }
+    ],
+    "webp": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/gunung-hutan-1/4-480w.webp",
+        "sizeBytes": 73702
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/gunung-hutan-1/4-768w.webp",
+        "sizeBytes": 146776
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/gunung-hutan-1/4-1080w.webp",
+        "sizeBytes": 241146
+      }
+    ],
+    "fallbackSrc": "/images/optimized/social-media/gunung-hutan-1/4-1080w.webp"
+  },
+  "social-media/gunung-hutan-1/5": {
+    "key": "social-media/gunung-hutan-1/5",
+    "originalFilename": "5.png",
+    "category": "social-media",
+    "originalWidth": 1080,
+    "originalHeight": 1350,
+    "outputWidth": 1080,
+    "outputHeight": 1350,
+    "aspectRatio": 0.8,
+    "originalSizeBytes": 2225901,
+    "avif": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/gunung-hutan-1/5-480w.avif",
+        "sizeBytes": 52811
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/gunung-hutan-1/5-768w.avif",
+        "sizeBytes": 104070
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/gunung-hutan-1/5-1080w.avif",
+        "sizeBytes": 163463
+      }
+    ],
+    "webp": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/gunung-hutan-1/5-480w.webp",
+        "sizeBytes": 56994
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/gunung-hutan-1/5-768w.webp",
+        "sizeBytes": 115782
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/gunung-hutan-1/5-1080w.webp",
+        "sizeBytes": 201578
+      }
+    ],
+    "fallbackSrc": "/images/optimized/social-media/gunung-hutan-1/5-1080w.webp"
+  },
+  "social-media/gunung-hutan-1/6": {
+    "key": "social-media/gunung-hutan-1/6",
+    "originalFilename": "6.png",
+    "category": "social-media",
+    "originalWidth": 1080,
+    "originalHeight": 1350,
+    "outputWidth": 1080,
+    "outputHeight": 1350,
+    "aspectRatio": 0.8,
+    "originalSizeBytes": 2331067,
+    "avif": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/gunung-hutan-1/6-480w.avif",
+        "sizeBytes": 54538
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/gunung-hutan-1/6-768w.avif",
+        "sizeBytes": 103122
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/gunung-hutan-1/6-1080w.avif",
+        "sizeBytes": 166032
+      }
+    ],
+    "webp": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/gunung-hutan-1/6-480w.webp",
+        "sizeBytes": 56924
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/gunung-hutan-1/6-768w.webp",
+        "sizeBytes": 116900
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/gunung-hutan-1/6-1080w.webp",
+        "sizeBytes": 198298
+      }
+    ],
+    "fallbackSrc": "/images/optimized/social-media/gunung-hutan-1/6-1080w.webp"
+  },
+  "social-media/gunung-hutan-1/7": {
+    "key": "social-media/gunung-hutan-1/7",
+    "originalFilename": "7.png",
+    "category": "social-media",
+    "originalWidth": 1080,
+    "originalHeight": 1350,
+    "outputWidth": 1080,
+    "outputHeight": 1350,
+    "aspectRatio": 0.8,
+    "originalSizeBytes": 2142642,
+    "avif": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/gunung-hutan-1/7-480w.avif",
+        "sizeBytes": 46401
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/gunung-hutan-1/7-768w.avif",
+        "sizeBytes": 89249
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/gunung-hutan-1/7-1080w.avif",
+        "sizeBytes": 132734
+      }
+    ],
+    "webp": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/gunung-hutan-1/7-480w.webp",
+        "sizeBytes": 48492
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/gunung-hutan-1/7-768w.webp",
+        "sizeBytes": 94998
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/gunung-hutan-1/7-1080w.webp",
+        "sizeBytes": 157734
+      }
+    ],
+    "fallbackSrc": "/images/optimized/social-media/gunung-hutan-1/7-1080w.webp"
+  },
+  "social-media/gunung-hutan-1/8": {
+    "key": "social-media/gunung-hutan-1/8",
+    "originalFilename": "8.png",
+    "category": "social-media",
+    "originalWidth": 1080,
+    "originalHeight": 1350,
+    "outputWidth": 1080,
+    "outputHeight": 1350,
+    "aspectRatio": 0.8,
+    "originalSizeBytes": 2658512,
+    "avif": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/gunung-hutan-1/8-480w.avif",
+        "sizeBytes": 70901
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/gunung-hutan-1/8-768w.avif",
+        "sizeBytes": 149772
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/gunung-hutan-1/8-1080w.avif",
+        "sizeBytes": 260942
+      }
+    ],
+    "webp": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/gunung-hutan-1/8-480w.webp",
+        "sizeBytes": 69186
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/gunung-hutan-1/8-768w.webp",
+        "sizeBytes": 147826
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/gunung-hutan-1/8-1080w.webp",
+        "sizeBytes": 261880
+      }
+    ],
+    "fallbackSrc": "/images/optimized/social-media/gunung-hutan-1/8-1080w.webp"
+  },
+  "social-media/gunung-hutan-1/9": {
+    "key": "social-media/gunung-hutan-1/9",
+    "originalFilename": "9.png",
+    "category": "social-media",
+    "originalWidth": 1080,
+    "originalHeight": 1350,
+    "outputWidth": 1080,
+    "outputHeight": 1350,
+    "aspectRatio": 0.8,
+    "originalSizeBytes": 1865091,
+    "avif": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/gunung-hutan-1/9-480w.avif",
+        "sizeBytes": 36162
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/gunung-hutan-1/9-768w.avif",
+        "sizeBytes": 75350
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/gunung-hutan-1/9-1080w.avif",
+        "sizeBytes": 130660
+      }
+    ],
+    "webp": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/gunung-hutan-1/9-480w.webp",
+        "sizeBytes": 38190
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/gunung-hutan-1/9-768w.webp",
+        "sizeBytes": 81708
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/gunung-hutan-1/9-1080w.webp",
+        "sizeBytes": 146776
+      }
+    ],
+    "fallbackSrc": "/images/optimized/social-media/gunung-hutan-1/9-1080w.webp"
+  },
+  "social-media/gunung-hutan-1/cover": {
+    "key": "social-media/gunung-hutan-1/cover",
+    "originalFilename": "cover.png",
+    "category": "social-media",
+    "originalWidth": 1080,
+    "originalHeight": 1350,
+    "outputWidth": 1080,
+    "outputHeight": 1350,
+    "aspectRatio": 0.8,
+    "originalSizeBytes": 2846377,
+    "avif": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/gunung-hutan-1/cover-480w.avif",
+        "sizeBytes": 111281
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/gunung-hutan-1/cover-768w.avif",
+        "sizeBytes": 181873
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/gunung-hutan-1/cover-1080w.avif",
+        "sizeBytes": 243769
+      }
+    ],
+    "webp": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/gunung-hutan-1/cover-480w.webp",
+        "sizeBytes": 112530
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/gunung-hutan-1/cover-768w.webp",
+        "sizeBytes": 204208
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/gunung-hutan-1/cover-1080w.webp",
+        "sizeBytes": 287468
+      }
+    ],
+    "fallbackSrc": "/images/optimized/social-media/gunung-hutan-1/cover-1080w.webp"
+  },
+  "social-media/malam-kelambu/1": {
+    "key": "social-media/malam-kelambu/1",
+    "originalFilename": "1.png",
+    "category": "social-media",
+    "originalWidth": 1080,
+    "originalHeight": 1350,
+    "outputWidth": 1080,
+    "outputHeight": 1350,
+    "aspectRatio": 0.8,
+    "originalSizeBytes": 2264137,
+    "avif": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/malam-kelambu/1-480w.avif",
+        "sizeBytes": 36550
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/malam-kelambu/1-768w.avif",
+        "sizeBytes": 61706
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/malam-kelambu/1-1080w.avif",
+        "sizeBytes": 87724
+      }
+    ],
+    "webp": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/malam-kelambu/1-480w.webp",
+        "sizeBytes": 44594
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/malam-kelambu/1-768w.webp",
+        "sizeBytes": 79602
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/malam-kelambu/1-1080w.webp",
+        "sizeBytes": 119848
+      }
+    ],
+    "fallbackSrc": "/images/optimized/social-media/malam-kelambu/1-1080w.webp"
+  },
+  "social-media/malam-kelambu/2": {
+    "key": "social-media/malam-kelambu/2",
+    "originalFilename": "2.png",
+    "category": "social-media",
+    "originalWidth": 1080,
+    "originalHeight": 1350,
+    "outputWidth": 1080,
+    "outputHeight": 1350,
+    "aspectRatio": 0.8,
+    "originalSizeBytes": 2578117,
+    "avif": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/malam-kelambu/2-480w.avif",
+        "sizeBytes": 43057
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/malam-kelambu/2-768w.avif",
+        "sizeBytes": 75794
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/malam-kelambu/2-1080w.avif",
+        "sizeBytes": 117358
+      }
+    ],
+    "webp": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/malam-kelambu/2-480w.webp",
+        "sizeBytes": 49330
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/malam-kelambu/2-768w.webp",
+        "sizeBytes": 92964
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/malam-kelambu/2-1080w.webp",
+        "sizeBytes": 151264
+      }
+    ],
+    "fallbackSrc": "/images/optimized/social-media/malam-kelambu/2-1080w.webp"
+  },
+  "social-media/malam-kelambu/3": {
+    "key": "social-media/malam-kelambu/3",
+    "originalFilename": "3.png",
+    "category": "social-media",
+    "originalWidth": 1080,
+    "originalHeight": 1350,
+    "outputWidth": 1080,
+    "outputHeight": 1350,
+    "aspectRatio": 0.8,
+    "originalSizeBytes": 2194743,
+    "avif": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/malam-kelambu/3-480w.avif",
+        "sizeBytes": 38847
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/malam-kelambu/3-768w.avif",
+        "sizeBytes": 72300
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/malam-kelambu/3-1080w.avif",
+        "sizeBytes": 116903
+      }
+    ],
+    "webp": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/malam-kelambu/3-480w.webp",
+        "sizeBytes": 44092
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/malam-kelambu/3-768w.webp",
+        "sizeBytes": 84118
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/malam-kelambu/3-1080w.webp",
+        "sizeBytes": 145750
+      }
+    ],
+    "fallbackSrc": "/images/optimized/social-media/malam-kelambu/3-1080w.webp"
+  },
+  "social-media/malam-kelambu/4": {
+    "key": "social-media/malam-kelambu/4",
+    "originalFilename": "4.png",
+    "category": "social-media",
+    "originalWidth": 1080,
+    "originalHeight": 1350,
+    "outputWidth": 1080,
+    "outputHeight": 1350,
+    "aspectRatio": 0.8,
+    "originalSizeBytes": 2395345,
+    "avif": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/malam-kelambu/4-480w.avif",
+        "sizeBytes": 49170
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/malam-kelambu/4-768w.avif",
+        "sizeBytes": 87353
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/malam-kelambu/4-1080w.avif",
+        "sizeBytes": 132193
+      }
+    ],
+    "webp": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/malam-kelambu/4-480w.webp",
+        "sizeBytes": 53898
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/malam-kelambu/4-768w.webp",
+        "sizeBytes": 102242
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/malam-kelambu/4-1080w.webp",
+        "sizeBytes": 162832
+      }
+    ],
+    "fallbackSrc": "/images/optimized/social-media/malam-kelambu/4-1080w.webp"
+  },
+  "social-media/malam-kelambu/5": {
+    "key": "social-media/malam-kelambu/5",
+    "originalFilename": "5.png",
+    "category": "social-media",
+    "originalWidth": 1080,
+    "originalHeight": 1350,
+    "outputWidth": 1080,
+    "outputHeight": 1350,
+    "aspectRatio": 0.8,
+    "originalSizeBytes": 2496269,
+    "avif": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/malam-kelambu/5-480w.avif",
+        "sizeBytes": 55953
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/malam-kelambu/5-768w.avif",
+        "sizeBytes": 100688
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/malam-kelambu/5-1080w.avif",
+        "sizeBytes": 152019
+      }
+    ],
+    "webp": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/malam-kelambu/5-480w.webp",
+        "sizeBytes": 60154
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/malam-kelambu/5-768w.webp",
+        "sizeBytes": 113528
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/malam-kelambu/5-1080w.webp",
+        "sizeBytes": 181190
+      }
+    ],
+    "fallbackSrc": "/images/optimized/social-media/malam-kelambu/5-1080w.webp"
+  },
+  "social-media/malam-kelambu/6": {
+    "key": "social-media/malam-kelambu/6",
+    "originalFilename": "6.png",
+    "category": "social-media",
+    "originalWidth": 1080,
+    "originalHeight": 1350,
+    "outputWidth": 1080,
+    "outputHeight": 1350,
+    "aspectRatio": 0.8,
+    "originalSizeBytes": 2375541,
+    "avif": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/malam-kelambu/6-480w.avif",
+        "sizeBytes": 45502
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/malam-kelambu/6-768w.avif",
+        "sizeBytes": 80620
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/malam-kelambu/6-1080w.avif",
+        "sizeBytes": 125275
+      }
+    ],
+    "webp": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/malam-kelambu/6-480w.webp",
+        "sizeBytes": 51938
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/malam-kelambu/6-768w.webp",
+        "sizeBytes": 97548
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/malam-kelambu/6-1080w.webp",
+        "sizeBytes": 156922
+      }
+    ],
+    "fallbackSrc": "/images/optimized/social-media/malam-kelambu/6-1080w.webp"
+  },
+  "social-media/malam-kelambu/7": {
+    "key": "social-media/malam-kelambu/7",
+    "originalFilename": "7.png",
+    "category": "social-media",
+    "originalWidth": 1080,
+    "originalHeight": 1350,
+    "outputWidth": 1080,
+    "outputHeight": 1350,
+    "aspectRatio": 0.8,
+    "originalSizeBytes": 2681544,
+    "avif": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/malam-kelambu/7-480w.avif",
+        "sizeBytes": 69518
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/malam-kelambu/7-768w.avif",
+        "sizeBytes": 135898
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/malam-kelambu/7-1080w.avif",
+        "sizeBytes": 224806
+      }
+    ],
+    "webp": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/malam-kelambu/7-480w.webp",
+        "sizeBytes": 70312
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/malam-kelambu/7-768w.webp",
+        "sizeBytes": 145330
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/malam-kelambu/7-1080w.webp",
+        "sizeBytes": 249884
+      }
+    ],
+    "fallbackSrc": "/images/optimized/social-media/malam-kelambu/7-1080w.webp"
+  },
+  "social-media/malam-kelambu/8": {
+    "key": "social-media/malam-kelambu/8",
+    "originalFilename": "8.png",
+    "category": "social-media",
+    "originalWidth": 1080,
+    "originalHeight": 1350,
+    "outputWidth": 1080,
+    "outputHeight": 1350,
+    "aspectRatio": 0.8,
+    "originalSizeBytes": 2495559,
+    "avif": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/malam-kelambu/8-480w.avif",
+        "sizeBytes": 67507
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/malam-kelambu/8-768w.avif",
+        "sizeBytes": 128330
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/malam-kelambu/8-1080w.avif",
+        "sizeBytes": 209523
+      }
+    ],
+    "webp": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/malam-kelambu/8-480w.webp",
+        "sizeBytes": 68380
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/malam-kelambu/8-768w.webp",
+        "sizeBytes": 137426
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/malam-kelambu/8-1080w.webp",
+        "sizeBytes": 228934
+      }
+    ],
+    "fallbackSrc": "/images/optimized/social-media/malam-kelambu/8-1080w.webp"
+  },
+  "social-media/tryout-3/1": {
+    "key": "social-media/tryout-3/1",
+    "originalFilename": "1.png",
+    "category": "social-media",
+    "originalWidth": 1080,
+    "originalHeight": 1350,
+    "outputWidth": 1080,
+    "outputHeight": 1350,
+    "aspectRatio": 0.8,
+    "originalSizeBytes": 4092716,
+    "avif": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/tryout-3/1-480w.avif",
+        "sizeBytes": 163500
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/tryout-3/1-768w.avif",
+        "sizeBytes": 409590
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/tryout-3/1-1080w.avif",
+        "sizeBytes": 778899
+      }
+    ],
+    "webp": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/tryout-3/1-480w.webp",
+        "sizeBytes": 157354
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/tryout-3/1-768w.webp",
+        "sizeBytes": 392470
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/tryout-3/1-1080w.webp",
+        "sizeBytes": 734158
+      }
+    ],
+    "fallbackSrc": "/images/optimized/social-media/tryout-3/1-1080w.webp"
+  },
+  "social-media/tryout-3/10": {
+    "key": "social-media/tryout-3/10",
+    "originalFilename": "10.png",
+    "category": "social-media",
+    "originalWidth": 1080,
+    "originalHeight": 1350,
+    "outputWidth": 1080,
+    "outputHeight": 1350,
+    "aspectRatio": 0.8,
+    "originalSizeBytes": 2417481,
+    "avif": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/tryout-3/10-480w.avif",
+        "sizeBytes": 47836
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/tryout-3/10-768w.avif",
+        "sizeBytes": 91391
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/tryout-3/10-1080w.avif",
+        "sizeBytes": 145869
+      }
+    ],
+    "webp": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/tryout-3/10-480w.webp",
+        "sizeBytes": 52732
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/tryout-3/10-768w.webp",
+        "sizeBytes": 108048
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/tryout-3/10-1080w.webp",
+        "sizeBytes": 188016
+      }
+    ],
+    "fallbackSrc": "/images/optimized/social-media/tryout-3/10-1080w.webp"
+  },
+  "social-media/tryout-3/2": {
+    "key": "social-media/tryout-3/2",
+    "originalFilename": "2.png",
+    "category": "social-media",
+    "originalWidth": 1080,
+    "originalHeight": 1350,
+    "outputWidth": 1080,
+    "outputHeight": 1350,
+    "aspectRatio": 0.8,
+    "originalSizeBytes": 3192550,
+    "avif": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/tryout-3/2-480w.avif",
+        "sizeBytes": 122919
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/tryout-3/2-768w.avif",
+        "sizeBytes": 253184
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/tryout-3/2-1080w.avif",
+        "sizeBytes": 404000
+      }
+    ],
+    "webp": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/tryout-3/2-480w.webp",
+        "sizeBytes": 115354
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/tryout-3/2-768w.webp",
+        "sizeBytes": 247862
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/tryout-3/2-1080w.webp",
+        "sizeBytes": 424402
+      }
+    ],
+    "fallbackSrc": "/images/optimized/social-media/tryout-3/2-1080w.webp"
+  },
+  "social-media/tryout-3/3": {
+    "key": "social-media/tryout-3/3",
+    "originalFilename": "3.png",
+    "category": "social-media",
+    "originalWidth": 1080,
+    "originalHeight": 1350,
+    "outputWidth": 1080,
+    "outputHeight": 1350,
+    "aspectRatio": 0.8,
+    "originalSizeBytes": 2387080,
+    "avif": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/tryout-3/3-480w.avif",
+        "sizeBytes": 66409
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/tryout-3/3-768w.avif",
+        "sizeBytes": 121902
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/tryout-3/3-1080w.avif",
+        "sizeBytes": 190283
+      }
+    ],
+    "webp": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/tryout-3/3-480w.webp",
+        "sizeBytes": 68872
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/tryout-3/3-768w.webp",
+        "sizeBytes": 133936
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/tryout-3/3-1080w.webp",
+        "sizeBytes": 220440
+      }
+    ],
+    "fallbackSrc": "/images/optimized/social-media/tryout-3/3-1080w.webp"
+  },
+  "social-media/tryout-3/4": {
+    "key": "social-media/tryout-3/4",
+    "originalFilename": "4.png",
+    "category": "social-media",
+    "originalWidth": 1080,
+    "originalHeight": 1350,
+    "outputWidth": 1080,
+    "outputHeight": 1350,
+    "aspectRatio": 0.8,
+    "originalSizeBytes": 2273445,
+    "avif": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/tryout-3/4-480w.avif",
+        "sizeBytes": 50172
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/tryout-3/4-768w.avif",
+        "sizeBytes": 88025
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/tryout-3/4-1080w.avif",
+        "sizeBytes": 131362
+      }
+    ],
+    "webp": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/tryout-3/4-480w.webp",
+        "sizeBytes": 55312
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/tryout-3/4-768w.webp",
+        "sizeBytes": 107302
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/tryout-3/4-1080w.webp",
+        "sizeBytes": 167548
+      }
+    ],
+    "fallbackSrc": "/images/optimized/social-media/tryout-3/4-1080w.webp"
+  },
+  "social-media/tryout-3/5": {
+    "key": "social-media/tryout-3/5",
+    "originalFilename": "5.png",
+    "category": "social-media",
+    "originalWidth": 1080,
+    "originalHeight": 1350,
+    "outputWidth": 1080,
+    "outputHeight": 1350,
+    "aspectRatio": 0.8,
+    "originalSizeBytes": 3558090,
+    "avif": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/tryout-3/5-480w.avif",
+        "sizeBytes": 143391
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/tryout-3/5-768w.avif",
+        "sizeBytes": 306999
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/tryout-3/5-1080w.avif",
+        "sizeBytes": 526381
+      }
+    ],
+    "webp": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/tryout-3/5-480w.webp",
+        "sizeBytes": 137910
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/tryout-3/5-768w.webp",
+        "sizeBytes": 302710
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/tryout-3/5-1080w.webp",
+        "sizeBytes": 539300
+      }
+    ],
+    "fallbackSrc": "/images/optimized/social-media/tryout-3/5-1080w.webp"
+  },
+  "social-media/tryout-3/6": {
+    "key": "social-media/tryout-3/6",
+    "originalFilename": "6.png",
+    "category": "social-media",
+    "originalWidth": 1080,
+    "originalHeight": 1350,
+    "outputWidth": 1080,
+    "outputHeight": 1350,
+    "aspectRatio": 0.8,
+    "originalSizeBytes": 3619552,
+    "avif": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/tryout-3/6-480w.avif",
+        "sizeBytes": 134012
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/tryout-3/6-768w.avif",
+        "sizeBytes": 299675
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/tryout-3/6-1080w.avif",
+        "sizeBytes": 568822
+      }
+    ],
+    "webp": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/tryout-3/6-480w.webp",
+        "sizeBytes": 128366
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/tryout-3/6-768w.webp",
+        "sizeBytes": 288972
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/tryout-3/6-1080w.webp",
+        "sizeBytes": 557396
+      }
+    ],
+    "fallbackSrc": "/images/optimized/social-media/tryout-3/6-1080w.webp"
+  },
+  "social-media/tryout-3/7": {
+    "key": "social-media/tryout-3/7",
+    "originalFilename": "7.png",
+    "category": "social-media",
+    "originalWidth": 1080,
+    "originalHeight": 1350,
+    "outputWidth": 1080,
+    "outputHeight": 1350,
+    "aspectRatio": 0.8,
+    "originalSizeBytes": 3482388,
+    "avif": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/tryout-3/7-480w.avif",
+        "sizeBytes": 134454
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/tryout-3/7-768w.avif",
+        "sizeBytes": 291882
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/tryout-3/7-1080w.avif",
+        "sizeBytes": 529551
+      }
+    ],
+    "webp": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/tryout-3/7-480w.webp",
+        "sizeBytes": 127318
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/tryout-3/7-768w.webp",
+        "sizeBytes": 288956
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/tryout-3/7-1080w.webp",
+        "sizeBytes": 521542
+      }
+    ],
+    "fallbackSrc": "/images/optimized/social-media/tryout-3/7-1080w.webp"
+  },
+  "social-media/tryout-3/8": {
+    "key": "social-media/tryout-3/8",
+    "originalFilename": "8.png",
+    "category": "social-media",
+    "originalWidth": 1080,
+    "originalHeight": 1350,
+    "outputWidth": 1080,
+    "outputHeight": 1350,
+    "aspectRatio": 0.8,
+    "originalSizeBytes": 2754794,
+    "avif": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/tryout-3/8-480w.avif",
+        "sizeBytes": 84709
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/tryout-3/8-768w.avif",
+        "sizeBytes": 186874
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/tryout-3/8-1080w.avif",
+        "sizeBytes": 343215
+      }
+    ],
+    "webp": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/tryout-3/8-480w.webp",
+        "sizeBytes": 81020
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/tryout-3/8-768w.webp",
+        "sizeBytes": 187894
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/tryout-3/8-1080w.webp",
+        "sizeBytes": 347956
+      }
+    ],
+    "fallbackSrc": "/images/optimized/social-media/tryout-3/8-1080w.webp"
+  },
+  "social-media/tryout-3/9": {
+    "key": "social-media/tryout-3/9",
+    "originalFilename": "9.png",
+    "category": "social-media",
+    "originalWidth": 1080,
+    "originalHeight": 1350,
+    "outputWidth": 1080,
+    "outputHeight": 1350,
+    "aspectRatio": 0.8,
+    "originalSizeBytes": 2605887,
+    "avif": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/tryout-3/9-480w.avif",
+        "sizeBytes": 78149
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/tryout-3/9-768w.avif",
+        "sizeBytes": 164251
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/tryout-3/9-1080w.avif",
+        "sizeBytes": 285547
+      }
+    ],
+    "webp": [
+      {
+        "width": 480,
+        "height": 600,
+        "path": "/images/optimized/social-media/tryout-3/9-480w.webp",
+        "sizeBytes": 76206
+      },
+      {
+        "width": 768,
+        "height": 960,
+        "path": "/images/optimized/social-media/tryout-3/9-768w.webp",
+        "sizeBytes": 168568
+      },
+      {
+        "width": 1080,
+        "height": 1350,
+        "path": "/images/optimized/social-media/tryout-3/9-1080w.webp",
+        "sizeBytes": 304586
+      }
+    ],
+    "fallbackSrc": "/images/optimized/social-media/tryout-3/9-1080w.webp"
+  }
+}

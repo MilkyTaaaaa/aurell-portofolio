@@ -1,26 +1,94 @@
 @import "tailwindcss";
 
+@theme {
+  --font-sans: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-mono), ui-monospace, SFMono-Regular, monospace;
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg-primary: #0a0a0c;
+  --bg-secondary: #121216;
+  --bg-card: #16161b;
+  --border-subtle: #26262e;
+  --text-primary: #f4f4f6;
+  --text-secondary: #a1a1aa;
+  --text-muted: #71717a;
+  --accent: #a3e635;
+  --accent-teal: #2dd4bf;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+html {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  scroll-behavior: smooth;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+::selection {
+  background-color: rgba(163, 230, 53, 0.2);
+  color: #bef264;
+}
+
+/* 1. Keyframes untuk Animasi Masuk Halaman (Hero & Page Load) */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+.animate-fade-up {
+  animation: fadeUp 0.65s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.delay-100 {
+  opacity: 0;
+  animation-delay: 180ms;
+}
+
+.delay-200 {
+  opacity: 0;
+  animation-delay: 320ms;
+}
+
+/* 2. Efek Interaksi Kursor pada Kartu Bento (Elevation & Subtle Lime Glow) */
+.bento-card-hover {
+  transition:
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.bento-card-hover:hover {
+  transform: translateY(-4px);
+  border-color: rgba(163, 230, 53, 0.45);
+  box-shadow:
+    0 14px 32px -12px rgba(0, 0, 0, 0.75),
+    0 0 20px -6px rgba(163, 230, 53, 0.12);
+}
+
+/* Hormati pengguna yang mengaktifkan Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .animate-fade-up,
+  .bento-card-hover,
+  .bento-card-hover:hover {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+    opacity: 1 !important;
+  }
+}
+
+/* Tekstur titik-titik teknis halus yang memudar di tepi */
+.bg-tech-grid {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px);
+  background-size: 24px 24px;
+  mask-image: radial-gradient(ellipse 80% 50% at 50% 0%, #000 60%, transparent 100%);
 }

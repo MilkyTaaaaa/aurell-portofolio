@@ -1,0 +1,5093 @@
+﻿================================================================
+FILE: D:\OLER\COOLYEAH DEK\Portofolio\oler\aurell-portfolio\docs\IMAGE-WORKFLOW.md
+================================================================
+# Panduan Lengkap Optimasi Gambar (Sharp AVIF & WebP) di Windows PowerShell
+
+Dokumen ini dirancang khusus agar kamu dapat mengelola puluhan hingga ratusan foto kamera berukuran besar (**10–20 MB per foto**) tanpa membuat website lambat atau membuat repository GitHub penuh.
+
+---
+
+## 1. Mengapa Tidak Boleh Langsung Memasukkan Foto 10–20 MB ke Website?
+
+1. **Kecepatan Website:** Jika pengunjung membuka galeri berisi 10 foto yang masing-masing berukuran 15 MB, mereka harus mengunduh **150 MB** hanya untuk melihat satu halaman. Di jaringan seluler, gambar akan gagal dimuat atau sangat lambat.
+2. **Batas Ukuran GitHub:** GitHub membatasi ukuran repository dan file. Menyimpan ratusan foto mentah di Git akan membuat proses `git push` dan proses build di Vercel menjadi sangat lambat.
+3. **Solusi di Proyek Ini:**
+   - Foto asli (10–20 MB) disimpan di folder `source-images/` yang **diabaikan oleh Git** (`.gitignore`).
+   - Script `npm run images:optimize` menggunakan **Sharp** di laptop Windows kamu untuk membuat versi ringan berformat **AVIF** dan **WebP** dalam beberapa ukuran layar (`480w`, `768w`, `1200w`, `1600w`, `2048w`), sekaligus menghapus data lokasi GPS dari EXIF demi privasi.
+   - Hasil ukurannya turun drastis dari **15 MB menjadi sekitar 120 KB – 350 KB** tanpa terlihat pecah!
+
+---
+
+## 2. Mengenal Perbedaan Format Gambar
+
+- **Original JPG / PNG:** File mentah dari kamera atau software desain (misal Canva/Figma). Ukurannya sangat besar (10–20 MB). Hanya disimpan di laptop lokal (`source-images/`).
+- **AVIF (`.avif`):** Format gambar generasi terbaru dengan kompresi paling efisien dan detail warna yang sangat halus. Browser modern (Chrome, Edge, Firefox, Safari terbaru) akan otomatis memilih file ini terlebih dahulu.
+- **WebP (`.webp`):** Format gambar modern yang didukung hampir seluruh browser sebagai *fallback* (cadangan) apabila browser pengunjung belum mendukung AVIF.
+- **Responsive Image Variants (`480w` s.d. `2048w`):**
+  - Layar HP hanya perlu mengunduh gambar lebar `480px` atau `768px`.
+  - Layar monitor laptop/PC atau saat membuka *Lightbox* layar penuh akan otomatis mengambil ukuran `1600px` atau `2048px`.
+- **Thumbnail vs Full-size Image:** Kamu tidak perlu memotong gambar *thumbnail* secara manual di Photoshop/Canva. Satu foto original otomatis dibuatkan ukuran kecil (untuk *card/grid*) dan ukuran besar (untuk *Lightbox*).
+
+---
+
+## 3. Tutorial Langkah demi Langkah (Menggunakan Windows PowerShell)
+
+### Langkah 1: Buka PowerShell di Folder Proyek
+Buka terminal di VS Code (`Ctrl + ~`) atau buka Windows PowerShell lalu masuk ke folder proyekmu:
+```powershell
+cd D:\path\ke\aurell-portfolio
+
+---
+## 4. Salin Foto Original (10–20 MB) ke Folder source-images/
+Masukkan foto sesuai kategorinya:
+- Foto kegiatan gunung/alam/dokumentasi -> source-images/photography/
+- Desain feed/carousel/poster IG -> source-images/social-media/
+- Screenshot aplikasi/proyek -> source-images/projects/
+- Foto kegiatan organisasi -> source-images/experiences/
+
+Contoh perintah di PowerShell untuk menyalin foto dari folder Downloads ke proyek (atau kamu bisa drag-and-drop lewat File Explorer Windows seperti biasa):
+
+    # Copy-Item "C:\Users\Aurell\Downloads\IMG_8821.JPG" -Destination ".\source-images\photography\merbabu-summit.jpg"
+
+---
+
+## 5: Jalankan Script Optimasi Sharp
+Ketik perintah berikut di PowerShell:
+    # npm run images:optimize
+
+---
+
+## 6: Daftarkan imageKey ke File Data TypeScript
+Perhatikan teks di dalam kurung siku pada laporan di atas: photography/merbabu-summit. Itulah imageKey milik fotomu (nama folder + nama file tanpa .jpg).
+
+Buka file src/data/photography.ts, lalu tambahkan ke dalam images pada album yang sesuai:
+
+# Contoh :
+    #     {
+    #   slug: "mountain-activities",
+    #   title: "Mountain & Vertical Activities",
+    #   category: "Mountain Activities",
+    #   description: "Dokumentasi kegiatan lapangan, operasional gunung hutan, dan aktivitas pemanjatan tebing.",
+    #   coverImageKey: "photography/merbabu-summit",
+    #   images: [
+    #     {
+    #       imageKey: "photography/merbabu-summit",
+    #       alt: "Kegiatan operasional lapangan di jalur pendakian",
+    #       caption: "Operasional lapangan gunung hutan",
+    #       date: "2026",
+    #       location: "Jawa Tengah"
+    #     }
+    #   ],
+    #   featured: true,
+    #   tags: ["Mountaineering", "Rock Climbing", "Field Operations"],
+    # }
+
+---
+## 7: Cek Tampilan di Browser Lokal
+Jalankan server lokal: 
+    #npm run dev
+
+
+
+================================================================
+FILE: D:\OLER\COOLYEAH DEK\Portofolio\oler\aurell-portfolio\scripts\optimize-images.mjs
+================================================================
+import fs from "node:fs/promises";
+import path from "node:path";
+import sharp from "sharp";
+sharp.cache({ files: 50, memory: 512 }); // Nonaktifkan cache internal Sharp untuk menghemat memori
+
+const ROOT_DIR = process.cwd();
+const SOURCE_DIR = path.join(ROOT_DIR, "source-images");
+const OUTPUT_DIR = path.join(ROOT_DIR, "public", "images", "optimized");
+const MANIFEST_PATH = path.join(ROOT_DIR, "src", "generated", "image-manifest.json");
+
+const TARGET_WIDTHS = [480, 768, 1200, 1600, 2048];
+const SUPPORTED_EXTENSIONS = new Set([".jpg", ".jpeg", ".png", ".webp", ".tiff"]);
+
+/**
+ * Konfigurasi preset kompresi berdasarkan kategori folder.
+ * - Photography: mengutamakan rentang dinamis, ketajaman tekstur alam/kegiatan, dan kompresi seimbang.
+ * - Social Media & Projects: mengutamakan ketajaman tipografi/garis desain poster agar teks tidak blur.
+ */
+const COMPRESSION_PRESETS = {
+  photography: {
+    avif: { quality: 68, effort: 4 },
+    webp: { quality: 82, effort: 4 },
+  },
+  "social-media": {
+    avif: { quality: 80, effort: 4 },
+    webp: { quality: 90, effort: 4, nearLossless: false },
+  },
+  default: {
+    avif: { quality: 74, effort: 4 },
+    webp: { quality: 85, effort: 4 },
+  },
+};
+
+async function getFilesRecursively(dir) {
+  let results = [];
+  try {
+    const entries = await fs.readdir(dir, { withFileTypes: true });
+    for (const entry of entries) {
+      const fullPath = path.join(dir, entry.name);
+      if (entry.isDirectory()) {
+        results = results.concat(await getFilesRecursively(fullPath));
+      } else if (entry.isFile()) {
+        const ext = path.extname(entry.name).toLowerCase();
+        if (SUPPORTED_EXTENSIONS.has(ext)) {
+          results.push(fullPath);
+        }
+      }
+    }
+  } catch (err) {
+    if (err.code !== "ENOENT") {
+      console.error(`Gagal membaca direktori ${dir}:`, err.message);
+    }
+  }
+  return results;
+}
+
+function formatBytes(bytes) {
+  if (bytes === 0) return "0 B";
+  const k = 1024;
+  const sizes = ["B", "KB", "MB", "GB"];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`;
+}
+
+async function runOptimization() {
+  console.log("============================================================");
+  console.log("  SHARP IMAGE OPTIMIZATION PIPELINE — AURELL PORTFOLIO");
+  console.log("============================================================");
+
+  await fs.mkdir(OUTPUT_DIR, { recursive: true });
+  await fs.mkdir(path.dirname(MANIFEST_PATH), { recursive: true });
+
+  const files = await getFilesRecursively(SOURCE_DIR);
+
+  if (files.length === 0) {
+    console.log("ℹ Tidak ditemukan gambar di folder source-images/.");
+    try {
+      await fs.access(MANIFEST_PATH);
+    } catch {
+      await fs.writeFile(MANIFEST_PATH, JSON.stringify({}, null, 2), "utf-8");
+    }
+    console.log("✔ Manifest kosong siap digunakan.\n");
+    return;
+  }
+
+  const manifest = {};
+  let totalOriginalBytes = 0;
+  let totalLargestOptimizedBytes = 0;
+
+  for (const filePath of files) {
+    const relFromSource = path.relative(SOURCE_DIR, filePath);
+    const normalizedRel = relFromSource.split(path.sep).join("/");
+    const parsed = path.parse(normalizedRel);
+
+    // Key unik tanpa ekstensi, misal: "photography/merbabu-01"
+    const imageKey = parsed.dir ? `${parsed.dir}/${parsed.name}` : parsed.name;
+    const category = parsed.dir.split("/")[0] || "default";
+    const preset = COMPRESSION_PRESETS[category] || COMPRESSION_PRESETS.default;
+
+    const stat = await fs.stat(filePath);
+    totalOriginalBytes += stat.size;
+
+    // Baca gambar dan auto-orient berdasarkan EXIF
+    const image = sharp(filePath, {limitInputPixels: false}).rotate();
+    const metadata = await image.metadata();
+
+    // Setelah .rotate(), jika orientasi EXIF >= 5 (90/270 deg), tukar dimensi efektif
+    const isSwapped = metadata.orientation && metadata.orientation >= 5;
+    const origWidth = isSwapped ? metadata.height : metadata.width;
+    const origHeight = isSwapped ? metadata.width : metadata.height;
+
+    if (!origWidth || !origHeight) {
+      console.warn(`⚠ Melewati ${normalizedRel}: dimensi gambar tidak terbaca.`);
+      continue;
+    }
+
+    const aspectRatio = Number((origWidth / origHeight).toFixed(4));
+
+    // Tentukan daftar ukuran yang tidak melebihi ukuran asli (tanpa upscaling)
+    const applicableWidths = TARGET_WIDTHS.filter((w) => w <= origWidth);
+    if (applicableWidths.length === 0 || applicableWidths[applicableWidths.length - 1] !== origWidth) {
+      if (origWidth < TARGET_WIDTHS[0]) {
+        applicableWidths.push(origWidth);
+      } else if (origWidth <= 2048 && !applicableWidths.includes(origWidth)) {
+        applicableWidths.push(origWidth);
+      }
+    }
+
+    const targetOutDir = path.join(OUTPUT_DIR, parsed.dir);
+    await fs.mkdir(targetOutDir, { recursive: true });
+
+    const avifVariants = [];
+    const webpVariants = [];
+    let largestAvifSize = 0;
+
+    for (const width of applicableWidths) {
+      const height = Math.round(width / aspectRatio);
+      const avifFilename = `${parsed.name}-${width}w.avif`;
+      const webpFilename = `${parsed.name}-${width}w.webp`;
+
+      const avifFullOut = path.join(targetOutDir, avifFilename);
+      const webpFullOut = path.join(targetOutDir, webpFilename);
+
+      const publicBasePath = `/images/optimized/${parsed.dir ? parsed.dir + "/" : ""}`;
+
+      // Pipeline menghapus metadata GPS/EXIF pribadi secara default pada Sharp
+      const pipeline = sharp(filePath, {limitInputPixels: false})
+        .rotate()
+        .resize({
+          width,
+          withoutEnlargement: true,
+          fit: "inside",
+        });
+
+      const avifInfo = await pipeline.clone().avif(preset.avif).toFile(avifFullOut);
+      const webpInfo = await pipeline.clone().webp(preset.webp).toFile(webpFullOut);
+
+      avifVariants.push({
+        width: avifInfo.width,
+        height: avifInfo.height,
+        path: `${publicBasePath}${avifFilename}`,
+        sizeBytes: avifInfo.size,
+      });
+
+      webpVariants.push({
+        width: webpInfo.width,
+        height: webpInfo.height,
+        path: `${publicBasePath}${webpFilename}`,
+        sizeBytes: webpInfo.size,
+      });
+
+      if (avifInfo.size > largestAvifSize) {
+        largestAvifSize = avifInfo.size;
+      }
+    }
+
+    totalLargestOptimizedBytes += largestAvifSize;
+
+    const highestVariant = webpVariants[webpVariants.length - 1];
+
+    manifest[imageKey] = {
+      key: imageKey,
+      originalFilename: parsed.base,
+      category,
+      originalWidth: origWidth,
+      originalHeight: origHeight,
+      outputWidth: highestVariant.width,
+      outputHeight: highestVariant.height,
+      aspectRatio,
+      originalSizeBytes: stat.size,
+      avif: avifVariants,
+      webp: webpVariants,
+      fallbackSrc: highestVariant.path,
+    };
+
+    console.log(
+      `✔ [${imageKey}] ${formatBytes(stat.size)} -> AVIF max ${formatBytes(largestAvifSize)} (${applicableWidths.join("w, ")}w)`
+    );
+  }
+
+  await fs.writeFile(MANIFEST_PATH, JSON.stringify(manifest, null, 2), "utf-8");
+
+  const savedPercent =
+    totalOriginalBytes > 0
+      ? (((totalOriginalBytes - totalLargestOptimizedBytes) / totalOriginalBytes) * 100).toFixed(1)
+      : "0";
+
+  console.log("------------------------------------------------------------");
+  console.log(`Total Gambar Diproses : ${Object.keys(manifest).length}`);
+  console.log(`Total Ukuran Original : ${formatBytes(totalOriginalBytes)}`);
+  console.log(`Total Ukuran Optimal  : ${formatBytes(totalLargestOptimizedBytes)} (Hemat ~${savedPercent}%)`);
+  console.log(`Manifest Tersimpan di : src/generated/image-manifest.json`);
+  console.log("============================================================\n");
+}
+
+runOptimization().catch((err) => {
+  console.error("❌ Gagal menjalankan optimasi gambar:", err);
+  process.exit(1);
+});
+
+
+
+================================================================
+FILE: D:\OLER\COOLYEAH DEK\Portofolio\oler\aurell-portfolio\src\app\about\page.tsx
+================================================================
+import React from "react";
+import type { Metadata } from "next";
+import Link from "next/link";
+import { profileData } from "@/data/profile";
+import { SectionHeader } from "@/components/ui/SectionHeader";
+import { ArrowRight } from "lucide-react";
+
+export const metadata: Metadata = {
+  title: "About",
+  description: `Latar belakang akademik, ketertarikan teknis, dan pendekatan kerja ${profileData.fullName}.`,
+};
+
+export default function AboutPage() {
+  const sections = [
+    {
+      number: "01",
+      title: "Personal Introduction",
+      paragraphs: profileData.aboutSections.personalIntroduction,
+    },
+    {
+      number: "02",
+      title: "Educational Background",
+      paragraphs: profileData.aboutSections.educationalBackground,
+    },
+    {
+      number: "03",
+      title: "Technical Interests",
+      paragraphs: profileData.aboutSections.technicalInterests,
+    },
+    {
+      number: "04",
+      title: "Professional Interests",
+      paragraphs: profileData.aboutSections.professionalInterests,
+    },
+    {
+      number: "05",
+      title: "Working Approach",
+      paragraphs: profileData.aboutSections.workingApproach,
+    },
+    {
+      number: "06",
+      title: "Career Direction",
+      paragraphs: profileData.aboutSections.careerDirection,
+    },
+  ];
+
+  return (
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 py-12 sm:py-20 space-y-16">
+      <SectionHeader
+        eyebrow="About / Profile"
+        title={profileData.fullName}
+        description={`${profileData.academicIdentity} · ${profileData.location}`}
+      />
+
+      <div className="space-y-10">
+        {sections.map((sec) => (
+          <section
+            key={sec.number}
+            className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-8 pb-10 border-b border-zinc-800/70"
+          >
+            <div className="md:col-span-4">
+              <span className="text-xs font-mono text-lime-400 block">
+                {sec.number}
+              </span>
+              <h2 className="text-lg font-semibold text-zinc-100 mt-1">
+                {sec.title}
+              </h2>
+            </div>
+            <div className="md:col-span-8 space-y-4">
+              {sec.paragraphs.map((p, idx) => (
+                <p
+                  key={idx}
+                  className="text-sm sm:text-base text-zinc-300 leading-relaxed"
+                >
+                  {p}
+                </p>
+              ))}
+            </div>
+          </section>
+        ))}
+      </div>
+
+      {/* 7. Contact CTA */}
+      <div className="rounded-xl border border-zinc-800 bg-[#121216] p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="space-y-1">
+          <h3 className="text-lg font-semibold text-zinc-100">
+            Ingin mengenal proyek atau pengalaman saya lebih jauh?
+          </h3>
+          <p className="text-sm text-zinc-400">
+            Jelajahi halaman proyek atau hubungi saya secara langsung.
+          </p>
+        </div>
+        <div className="flex gap-3">
+          <Link
+            href="/projects"
+            className="px-4 py-2 rounded-lg bg-zinc-900 border border-zinc-700 text-xs font-mono text-zinc-200 hover:border-lime-400"
+          >
+            Lihat Proyek
+          </Link>
+          <Link
+            href="/contact"
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-lime-400 text-zinc-950 text-xs font-mono font-semibold hover:bg-lime-300"
+          >
+            <span>Hubungi Saya</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
+
+================================================================
+FILE: D:\OLER\COOLYEAH DEK\Portofolio\oler\aurell-portfolio\src\app\contact\page.tsx
+================================================================
+import React from "react";
+import type { Metadata } from "next";
+import { profileData } from "@/data/profile";
+import { socialLinks } from "@/data/social-links";
+import { SectionHeader } from "@/components/ui/SectionHeader";
+import { ArrowUpRight, MapPin } from "lucide-react";
+
+export const metadata: Metadata = {
+  title: "Contact",
+  description: `Hubungi ${profileData.fullName} untuk kolaborasi proyek perangkat lunak atau komunikasi profesional.`,
+};
+
+export default function ContactPage() {
+  return (
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 py-12 sm:py-20 space-y-12">
+      <SectionHeader
+        eyebrow="Contact & Channels"
+        title="Mari Terhubung"
+        description="Terbuka untuk diskusi seputar pengembangan perangkat lunak, arsitektur backend, kolaborasi proyek akademik/komunitas, maupun kesempatan profesional."
+      />
+
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+        <div className="md:col-span-5 rounded-xl border border-zinc-800 bg-[#121216] p-6 space-y-4">
+          <p className="text-xs font-mono uppercase tracking-wider text-lime-400">
+            Identitas & Lokasi
+          </p>
+          <div className="space-y-1">
+            <h2 className="text-lg font-semibold text-zinc-100">
+              {profileData.fullName}
+            </h2>
+            <p className="text-xs text-zinc-400">
+              {profileData.academicIdentity}
+            </p>
+          </div>
+          <div className="flex items-center gap-2 text-xs font-mono text-zinc-300 pt-2">
+            <MapPin className="w-4 h-4 text-lime-400" />
+            <span>{profileData.location}</span>
+          </div>
+        </div>
+
+        <div className="md:col-span-7 space-y-3">
+          {socialLinks.map((item) => (
+            <a
+              key={item.platform}
+              href={item.url}
+              target={item.url.startsWith("mailto:") ? undefined : "_blank"}
+              rel={
+                item.url.startsWith("mailto:")
+                  ? undefined
+                  : "noopener noreferrer"
+              }
+              className="group rounded-xl border border-zinc-800 bg-[#121216] hover:border-lime-400/60 p-5 flex items-center justify-between transition-colors"
+            >
+              <div className="space-y-1">
+                <span className="text-xs font-mono text-zinc-400 block">
+                  {item.label}
+                </span>
+                <span className="text-base font-medium text-zinc-100 group-hover:text-lime-300 transition-colors">
+                  {item.usernameOrAddress}
+                </span>
+              </div>
+              <ArrowUpRight className="w-5 h-5 text-zinc-500 group-hover:text-lime-400 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+            </a>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
+
+================================================================
+FILE: D:\OLER\COOLYEAH DEK\Portofolio\oler\aurell-portfolio\src\app\creative-works\photography\page.tsx
+================================================================
+import React from "react";
+import type { Metadata } from "next";
+import Link from "next/link";
+import { photographyAlbums } from "@/data/photography";
+import { SectionHeader } from "@/components/ui/SectionHeader";
+import { PhotographyGallery } from "@/components/gallery/PhotographyGallery";
+import { ArrowLeft } from "lucide-react";
+
+export const metadata: Metadata = {
+  title: "Photography — Creative Works",
+  description:
+    "Galeri fotografi kegiatan lapangan, alam bebas, dan dokumentasi organisasi Aurell Satrianitto Prianggono.",
+};
+
+export default function PhotographyPage() {
+  return (
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-20 space-y-10">
+      <Link
+        href="/creative-works"
+        className="inline-flex items-center gap-2 text-xs font-mono text-zinc-400 hover:text-lime-400 transition-colors"
+      >
+        <ArrowLeft className="w-4 h-4" />
+        <span>Kembali ke Creative Works</span>
+      </Link>
+
+      <SectionHeader
+        eyebrow="Creative Works / Photography"
+        title="Koleksi Album & Galeri Fotografi"
+        description="Mendukung orientasi portrait, landscape, dan square tanpa pemotongan paksa, dilengkapi optimasi AVIF/WebP serta fitur Lightbox."
+      />
+
+      <PhotographyGallery albums={photographyAlbums} />
+    </div>
+  );
+}
+
+
+
+================================================================
+FILE: D:\OLER\COOLYEAH DEK\Portofolio\oler\aurell-portfolio\src\app\creative-works\social-media\page.tsx
+================================================================
+import React from "react";
+import type { Metadata } from "next";
+import Link from "next/link";
+import { socialMediaWorks } from "@/data/social-media";
+import { SectionHeader } from "@/components/ui/SectionHeader";
+import { SocialMediaGallery } from "@/components/gallery/SocialMediaGallery";
+import { ArrowLeft } from "lucide-react";
+
+export const metadata: Metadata = {
+  title: "Social Media Content — Creative Works",
+  description:
+    "Portofolio produksi dan pengelolaan konten media sosial kegiatan organisasi oleh Aurell Satrianitto Prianggono.",
+};
+
+export default function SocialMediaPage() {
+  return (
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-20 space-y-10">
+      <Link
+        href="/creative-works"
+        className="inline-flex items-center gap-2 text-xs font-mono text-zinc-400 hover:text-lime-400 transition-colors"
+      >
+        <ArrowLeft className="w-4 h-4" />
+        <span>Kembali ke Creative Works</span>
+      </Link>
+
+      <SectionHeader
+        eyebrow="Creative Works / Social Media"
+        title="Konten Publikasi & Media Sosial"
+        description="Menampilkan rangkaian feed, carousel informasi kepanitiaan, dan dokumentasi visual dengan mempertahankan proporsi utuh setiap desain."
+      />
+
+      <SocialMediaGallery works={socialMediaWorks} />
+    </div>
+  );
+}
+
+
+
+================================================================
+FILE: D:\OLER\COOLYEAH DEK\Portofolio\oler\aurell-portfolio\src\app\creative-works\page.tsx
+================================================================
+import React from "react";
+import type { Metadata } from "next";
+import Link from "next/link";
+import { photographyAlbums } from "@/data/photography";
+import { socialMediaWorks } from "@/data/social-media";
+import { SectionHeader } from "@/components/ui/SectionHeader";
+import { ArrowUpRight, Camera, Layers } from "lucide-react";
+
+export const metadata: Metadata = {
+  title: "Creative Works",
+  description:
+    "Karya fotografi dan pengelolaan konten media sosial oleh Aurell Satrianitto Prianggono.",
+};
+
+export default function CreativeWorksPage() {
+  return (
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-20 space-y-12">
+      <SectionHeader
+        eyebrow="Creative Works"
+        title="Fotografi & Konten Media Sosial"
+        description="Dokumentasi visual dibagi secara spesifik ke dalam dua kategori utama: Fotografi kegiatan lapangan/alam dan produksi serta pengelolaan konten publikasi media sosial."
+      />
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {/* Kategori A: Photography */}
+        <div className="rounded-2xl border border-zinc-800 bg-[#121216] p-8 flex flex-col justify-between space-y-8">
+          <div className="space-y-4">
+            <div className="w-11 h-11 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-lime-400">
+              <Camera className="w-5 h-5" />
+            </div>
+            <span className="text-xs font-mono uppercase tracking-widest text-lime-400 block">
+              Fokus 01 · Photography
+            </span>
+            <h2 className="text-2xl font-semibold text-zinc-100">
+              Galeri Fotografi Pribadi & Lapangan
+            </h2>
+            <p className="text-sm text-zinc-400 leading-relaxed">
+              Kumpulan album fotografi yang mencakup aktivitas gunung hutan, kegiatan panjat tebing, lanskap alam terbuka, serta dokumentasi kegiatan organisasi. Disajikan dengan layout adaptive masonry yang menjaga rasio asli setiap foto.
+            </p>
+            <div className="pt-2 space-y-2">
+              <p className="text-xs font-mono text-zinc-500">
+                Koleksi Album Tersedia ({photographyAlbums.length}):
+              </p>
+              <ul className="space-y-1.5 text-xs text-zinc-300 font-mono">
+                {photographyAlbums.map((album) => (
+                  <li key={album.slug}>• {album.title}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          <Link
+            href="/creative-works/photography"
+            className="inline-flex items-center justify-between w-full px-5 py-3.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-700/80 text-sm font-mono text-zinc-100 transition-colors"
+          >
+            <span>Buka Halaman Photography</span>
+            <ArrowUpRight className="w-4 h-4 text-lime-400" />
+          </Link>
+        </div>
+
+        {/* Kategori B: Social Media Content */}
+        <div className="rounded-2xl border border-zinc-800 bg-[#121216] p-8 flex flex-col justify-between space-y-8">
+          <div className="space-y-4">
+            <div className="w-11 h-11 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-lime-400">
+              <Layers className="w-5 h-5" />
+            </div>
+            <span className="text-xs font-mono uppercase tracking-widest text-lime-400 block">
+              Fokus 02 · Social Media Content
+            </span>
+            <h2 className="text-2xl font-semibold text-zinc-100">
+              Publikasi Feed & Dokumentasi Media Sosial
+            </h2>
+            <p className="text-sm text-zinc-400 leading-relaxed">
+              Arsip karya publikasi feed, carousel informasi kegiatan (seperti GLADIMULA XLIII), dan dokumentasi lapangan gunung hutan. Menampilkan kontribusi secara jujur antara karya kolaborasi tim dan kontribusi langsung tanpa memotong elemen tipografi desain.
+            </p>
+            <div className="pt-2 space-y-2">
+              <p className="text-xs font-mono text-zinc-500">
+                Rangkaian Konten Terdaftar ({socialMediaWorks.length}):
+              </p>
+              <ul className="space-y-1.5 text-xs text-zinc-300 font-mono">
+                {socialMediaWorks.map((work) => (
+                  <li key={work.slug}>• {work.title}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          <Link
+            href="/creative-works/social-media"
+            className="inline-flex items-center justify-between w-full px-5 py-3.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-700/80 text-sm font-mono text-zinc-100 transition-colors"
+          >
+            <span>Buka Halaman Social Media Content</span>
+            <ArrowUpRight className="w-4 h-4 text-lime-400" />
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
+
+================================================================
+FILE: D:\OLER\COOLYEAH DEK\Portofolio\oler\aurell-portfolio\src\app\education\page.tsx
+================================================================
+import React from "react";
+import type { Metadata } from "next";
+import {
+  educationList,
+  certificationsList,
+  languageTestsList,
+} from "@/data/education";
+import { SectionHeader } from "@/components/ui/SectionHeader";
+import { Award, BookOpen, GraduationCap } from "lucide-react";
+
+export const metadata: Metadata = {
+  title: "Education & Certifications",
+  description:
+    "Riwayat pendidikan, sertifikasi kompetensi BNSP, dan skor uji bahasa Inggris ETS TOEIC Aurell Satrianitto Prianggono.",
+};
+
+export default function EducationPage() {
+  return (
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 py-12 sm:py-20 space-y-14">
+      <SectionHeader
+        eyebrow="Academic & Credentials"
+        title="Pendidikan, Sertifikasi & Uji Bahasa"
+        description="Informasi akademik resmi, sertifikasi kompetensi teknis, dan hasil pengujian kemampuan bahasa."
+      />
+
+      {/* Education */}
+      <section className="space-y-4">
+        <h2 className="text-sm font-mono uppercase tracking-wider text-lime-400 flex items-center gap-2">
+          <GraduationCap className="w-4 h-4" />
+          <span>Pendidikan Tinggi</span>
+        </h2>
+        {educationList.map((edu) => (
+          <div
+            key={edu.degree}
+            className="rounded-xl border border-zinc-800 bg-[#121216] p-6 sm:p-8 space-y-2"
+          >
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <h3 className="text-xl font-semibold text-zinc-100">
+                {edu.degree}
+              </h3>
+              <span className="text-xs font-mono text-lime-400 bg-lime-400/10 border border-lime-400/30 px-2.5 py-1 rounded">
+                {edu.period}
+              </span>
+            </div>
+            <p className="text-base text-zinc-300 font-medium">
+              {edu.institution}
+            </p>
+            {edu.description && (
+              <p className="text-sm text-zinc-400 leading-relaxed pt-2">
+                {edu.description}
+              </p>
+            )}
+          </div>
+        ))}
+      </section>
+
+      {/* Certification */}
+      <section className="space-y-4">
+        <h2 className="text-sm font-mono uppercase tracking-wider text-lime-400 flex items-center gap-2">
+          <Award className="w-4 h-4" />
+          <span>Sertifikasi Kompetensi</span>
+        </h2>
+        <div className="grid grid-cols-1 gap-4">
+          {certificationsList.map((cert) => (
+            <div
+              key={cert.title}
+              className="rounded-xl border border-zinc-800 bg-[#121216] p-6 space-y-1"
+            >
+              <h3 className="text-lg font-semibold text-zinc-100">
+                {cert.title}
+              </h3>
+              <p className="text-sm text-zinc-400">{cert.issuer}</p>
+              {cert.year && (
+                <p className="text-xs text-zinc-500">
+                  Tahun: {cert.year}
+                </p>
+              )}
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* English Test */}
+      <section className="space-y-4">
+        <h2 className="text-sm font-mono uppercase tracking-wider text-lime-400 flex items-center gap-2">
+          <BookOpen className="w-4 h-4" />
+          <span>English Proficiency Test</span>
+        </h2>
+        <div className="grid grid-cols-1 gap-4">
+          {languageTestsList.map((test) => (
+            <div
+              key={test.testName}
+              className="rounded-xl border border-zinc-800 bg-[#121216] p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+            >
+              <div className="space-y-1">
+                <h3 className="text-lg font-semibold text-zinc-100">
+                  {test.testName}
+                </h3>
+                <p className="text-sm text-zinc-400">{test.organizer}</p>
+                {test.year && (
+                  <p className="text-xs text-zinc-500">
+                    Tahun: {test.year}
+                  </p>
+                )}
+              </div>
+              <div className="px-4 py-2 rounded-lg bg-zinc-950 border border-zinc-800 text-right">
+                <span className="text-xs font-mono text-zinc-500 block">
+                  Official Score
+                </span>
+                <span className="text-lg font-mono font-semibold text-lime-400">
+                  {test.score}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+    </div>
+  );
+}
+
+
+
+================================================================
+FILE: D:\OLER\COOLYEAH DEK\Portofolio\oler\aurell-portfolio\src\app\experience\[slug]\page.tsx
+================================================================
+import React from "react";
+import type { Metadata } from "next";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { experiencesData } from "@/data/experiences";
+import { Badge } from "@/components/ui/Badge";
+import { ResponsiveImage } from "@/components/ui/ResponsiveImage";
+import { ArrowLeft } from "lucide-react";
+
+interface PageProps {
+  params: Promise<{ slug: string }>;
+}
+
+export async function generateStaticParams() {
+  return experiencesData.map((exp) => ({
+    slug: exp.slug,
+  }));
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const exp = experiencesData.find((e) => e.slug === slug);
+  if (!exp) return { title: "Pengalaman Tidak Ditemukan" };
+
+  return {
+    title: `${exp.position} — ${exp.programName || exp.organization}`,
+    description: exp.description,
+  };
+}
+
+export default async function ExperienceDetailPage({ params }: PageProps) {
+  const { slug } = await params;
+  const exp = experiencesData.find((e) => e.slug === slug);
+
+  if (!exp) {
+    notFound();
+  }
+
+  return (
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 py-12 sm:py-20 space-y-10">
+      <Link
+        href="/experience"
+        className="inline-flex items-center gap-2 text-xs font-mono text-zinc-400 hover:text-lime-400 transition-colors"
+      >
+        <ArrowLeft className="w-4 h-4" />
+        <span>Kembali ke Halaman Pengalaman</span>
+      </Link>
+
+      <header className="space-y-4 border-b border-zinc-800 pb-8">
+        <div className="flex flex-wrap items-center gap-2">
+          <Badge variant={exp.isCurrent ? "accent" : "default"}>
+            {exp.isCurrent ? "Active · " : ""}
+            {exp.period}
+          </Badge>
+          <Badge variant="outline">
+            {exp.category === "organizational"
+              ? "Organizational Experience"
+              : "Program & Committee Experience"}
+          </Badge>
+        </div>
+
+        <h1 className="text-2xl sm:text-4xl font-semibold text-zinc-100">
+          {exp.position}
+        </h1>
+
+        <p className="text-base font-medium text-lime-400">
+          {exp.programName
+            ? `${exp.programName} · ${exp.organization}`
+            : exp.organization}
+        </p>
+
+        {exp.additionalPositions && exp.additionalPositions.length > 0 && (
+          <div className="pt-2 flex flex-wrap items-center gap-2">
+            <span className="text-xs font-mono text-zinc-400">
+              Cakupan Peran Terpadu:
+            </span>
+            {exp.additionalPositions.map((pos) => (
+              <Badge key={pos} variant="default">
+                {pos}
+              </Badge>
+            ))}
+          </div>
+        )}
+      </header>
+
+      <section className="space-y-3">
+        <h2 className="text-sm font-mono uppercase tracking-wider text-lime-400">
+          Deskripsi Peran
+        </h2>
+        <p className="text-zinc-300 leading-relaxed">{exp.description}</p>
+      </section>
+
+      <section className="rounded-xl border border-zinc-800 bg-[#121216] p-6 sm:p-8 space-y-4">
+        <h2 className="text-sm font-mono uppercase tracking-wider text-lime-400">
+          Rincian Tanggung Jawab
+        </h2>
+        <ul className="space-y-2.5">
+          {exp.responsibilities.map((res) => (
+            <li
+              key={res}
+              className="flex items-start gap-3 text-sm text-zinc-200 bg-zinc-950/60 border border-zinc-800/70 rounded-lg p-3.5"
+            >
+              <span className="text-lime-400 font-mono">→</span>
+              <span>{res}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      {exp.images.length > 0 && (
+        <section className="space-y-4">
+          <h2 className="text-sm font-mono uppercase tracking-wider text-lime-400">
+            Dokumentasi Kegiatan
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {exp.images.map((img) => (
+              <figure
+                key={img.imageKey}
+                className="rounded-xl overflow-hidden border border-zinc-800 bg-zinc-950"
+              >
+                <ResponsiveImage imageKey={img.imageKey} alt={img.alt} />
+                {img.caption && (
+                  <figcaption className="p-3 text-xs text-zinc-400">
+                    {img.caption}
+                  </figcaption>
+                )}
+              </figure>
+            ))}
+          </div>
+        </section>
+      )}
+    </div>
+  );
+}
+
+
+
+================================================================
+FILE: D:\OLER\COOLYEAH DEK\Portofolio\oler\aurell-portfolio\src\app\experience\page.tsx
+================================================================
+import React from "react";
+import type { Metadata } from "next";
+import { experiencesData } from "@/data/experiences";
+import { SectionHeader } from "@/components/ui/SectionHeader";
+import { ExperienceCard } from "@/components/cards/ExperienceCard";
+
+export const metadata: Metadata = {
+  title: "Experience & Organization",
+  description:
+    "Rekam jejak organisasi, komunitas teknologi, dan kepanitiaan program kerja Aurell Satrianitto Prianggono.",
+};
+
+export default function ExperiencePage() {
+  const organizationalList = experiencesData.filter(
+    (e) => e.category === "organizational"
+  );
+  const committeeList = experiencesData.filter(
+    (e) => e.category === "committee"
+  );
+
+  return (
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-20 space-y-16">
+      <SectionHeader
+        eyebrow="Experience & Leadership"
+        title="Organisasi, Komunitas & Kepanitiaan"
+        description="Dokumentasi tanggung jawab struktural organisasi, eksplorasi teknis komunitas, serta pelaksanaan kepanitiaan program kerja."
+      />
+
+      {/* A. Organizational Experience */}
+      <section className="space-y-6">
+        <div className="space-y-1">
+          <h2 className="text-xl font-semibold text-zinc-100">
+            A. Organizational Experience
+          </h2>
+          <p className="text-sm text-zinc-400">
+            Jabatan struktural, pengelolaan operasional, inventaris logistik, dan keanggotaan komunitas teknologi.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {organizationalList.map((exp) => (
+            <ExperienceCard key={exp.slug} experience={exp} />
+          ))}
+        </div>
+      </section>
+
+      {/* B. Selected Programs & Committee Experience */}
+      <section className="space-y-6">
+        <div className="space-y-1">
+          <h2 className="text-xl font-semibold text-zinc-100">
+            B. Selected Programs & Committee Experience
+          </h2>
+          <p className="text-sm text-zinc-400">
+            Keterlibatan dalam kepanitiaan program kerja utama, koordinasi tim lapangan, serta pengelolaan media dan dokumentasi.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {committeeList.map((exp) => (
+            <ExperienceCard key={exp.slug} experience={exp} />
+          ))}
+        </div>
+      </section>
+    </div>
+  );
+}
+
+
+
+================================================================
+FILE: D:\OLER\COOLYEAH DEK\Portofolio\oler\aurell-portfolio\src\app\projects\[slug]\page.tsx
+================================================================
+import React from "react";
+import type { Metadata } from "next";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { projectsData } from "@/data/projects";
+import { Badge } from "@/components/ui/Badge";
+import { ResponsiveImage } from "@/components/ui/ResponsiveImage";
+import { ArrowLeft, ArrowUpRight, GitBranch, Info } from "lucide-react";
+
+interface PageProps {
+  params: Promise<{ slug: string }>;
+}
+
+export async function generateStaticParams() {
+  return projectsData.map((project) => ({
+    slug: project.slug,
+  }));
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const project = projectsData.find((p) => p.slug === slug);
+  if (!project) return { title: "Proyek Tidak Ditemukan" };
+
+  return {
+    title: `${project.title} — Project Detail`,
+    description: project.description,
+  };
+}
+
+export default async function ProjectDetailPage({ params }: PageProps) {
+  const { slug } = await params;
+  const project = projectsData.find((p) => p.slug === slug);
+
+  if (!project) {
+    notFound();
+  }
+
+  return (
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 py-12 sm:py-20 space-y-12">
+      <Link
+        href="/projects"
+        className="inline-flex items-center gap-2 text-xs font-mono text-zinc-400 hover:text-lime-400 transition-colors"
+      >
+        <ArrowLeft className="w-4 h-4" />
+        <span>Kembali ke Daftar Proyek</span>
+      </Link>
+
+      {/* 1. Project Header */}
+      <header className="space-y-4 border-b border-zinc-800 pb-8">
+        <div className="flex flex-wrap items-center gap-2">
+          <Badge variant="accent">{project.category}</Badge>
+          {project.typeLabel && <Badge variant="default">{project.typeLabel}</Badge>}
+          <span className="text-xs font-mono text-zinc-400">{project.period}</span>
+        </div>
+
+        <h1 className="text-3xl sm:text-4xl font-semibold text-zinc-100">
+          {project.title}
+        </h1>
+
+        <p className="text-base sm:text-lg text-zinc-300 leading-relaxed">
+          {project.description}
+        </p>
+
+        <div className="flex flex-wrap items-center gap-4 pt-2">
+          {project.githubUrl ? (
+            <a
+              href={project.githubUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-zinc-900 border border-zinc-700 text-xs font-mono text-zinc-100 hover:border-lime-400 transition-colors"
+            >
+              <GitBranch className="w-4 h-4 text-lime-400" />
+              <span>GitHub Repository</span>
+              <ArrowUpRight className="w-3.5 h-3.5" />
+            </a>
+          ) : project.repositoryNote ? (
+            <span className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-zinc-900/60 border border-zinc-800 text-xs font-mono text-zinc-400">
+              <Info className="w-4 h-4 text-zinc-500" />
+              <span>{project.repositoryNote}</span>
+            </span>
+          ) : null}
+
+          {project.liveUrl && (
+            <a
+              href={project.liveUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-lime-400 text-zinc-950 text-xs font-mono font-semibold hover:bg-lime-300 transition-colors"
+            >
+              <span>Live Demo</span>
+              <ArrowUpRight className="w-3.5 h-3.5" />
+            </a>
+          )}
+        </div>
+      </header>
+
+      {/* 2. Project Overview */}
+      {project.overview && (
+        <section className="space-y-3">
+          <h2 className="text-sm font-mono uppercase tracking-wider text-lime-400">
+            Ringkasan Proyek
+          </h2>
+          <p className="text-zinc-300 leading-relaxed">{project.overview}</p>
+        </section>
+      )}
+
+      {/* 3 & 4. Background / Problem & Solution (Hanya tampil jika tersedia) */}
+      {project.background && (
+        <section className="space-y-3">
+          <h2 className="text-sm font-mono uppercase tracking-wider text-lime-400">
+            Latar Belakang
+          </h2>
+          <p className="text-zinc-300 leading-relaxed">{project.background}</p>
+        </section>
+      )}
+
+      {project.solution && (
+        <section className="space-y-3">
+          <h2 className="text-sm font-mono uppercase tracking-wider text-lime-400">
+            Solusi
+          </h2>
+          <p className="text-zinc-300 leading-relaxed">{project.solution}</p>
+        </section>
+      )}
+
+      {/* 5 & 6. My Role & Responsibilities */}
+      <section className="rounded-xl border border-zinc-800/90 bg-[#121216] p-6 sm:p-8 space-y-6">
+        <div>
+          <p className="text-xs font-mono uppercase tracking-wider text-lime-400">
+            Peran Saya
+          </p>
+          <h2 className="text-xl font-semibold text-zinc-100 mt-1">
+            {project.role}
+          </h2>
+        </div>
+
+        <div className="space-y-2">
+          <h3 className="text-xs font-mono uppercase tracking-wider text-zinc-400">
+            Tanggung Jawab & Sorotan Teknis
+          </h3>
+          <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+            {project.responsibilities.map((item) => (
+              <li
+                key={item}
+                className="flex items-start gap-2.5 text-sm text-zinc-300 bg-zinc-950/60 border border-zinc-800/70 rounded-lg p-3"
+              >
+                <span className="text-lime-400 font-mono">→</span>
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {project.collaborationNote && (
+          <div className="rounded-lg bg-zinc-950/90 border border-zinc-800 p-4 text-xs text-zinc-400 leading-relaxed">
+            <strong className="text-zinc-200 font-mono block mb-1">
+              Catatan Kolaborasi Tim:
+            </strong>
+            {project.collaborationNote}
+          </div>
+        )}
+      </section>
+
+      {/* 7. Technology Stack */}
+      <section className="space-y-4">
+        <h2 className="text-sm font-mono uppercase tracking-wider text-lime-400">
+          Technology Stack
+        </h2>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="rounded-xl border border-zinc-800 bg-[#121216] p-5 space-y-3">
+            <p className="text-xs font-mono text-zinc-400">
+              Fokus & Kontribusi Langsung
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {project.technologies.personalContribution.map((tech) => (
+                <Badge key={tech} variant="accent">
+                  {tech}
+                </Badge>
+              ))}
+            </div>
+          </div>
+
+          {project.technologies.teamOrContext &&
+            project.technologies.teamOrContext.length > 0 && (
+              <div className="rounded-xl border border-zinc-800 bg-[#121216] p-5 space-y-3">
+                <p className="text-xs font-mono text-zinc-400">
+                  Stack Konteks Tim / Proyek
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {project.technologies.teamOrContext.map((tech) => (
+                    <Badge key={tech} variant="default">
+                      {tech}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+        </div>
+      </section>
+
+      {/* 10. Result / Current Status */}
+      {project.status && (
+        <section className="rounded-xl border border-zinc-800/80 bg-zinc-950/60 p-5 flex items-center justify-between">
+          <span className="text-xs font-mono uppercase tracking-wider text-zinc-400">
+            Status Proyek
+          </span>
+          <span className="text-sm font-mono text-zinc-200">
+            {project.status}
+          </span>
+        </section>
+      )}
+
+      {/* 11. Project Gallery (Hanya tampil jika ada gambar) */}
+      {project.gallery.length > 0 && (
+        <section className="space-y-4">
+          <h2 className="text-sm font-mono uppercase tracking-wider text-lime-400">
+            Dokumentasi Visual Proyek
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {project.gallery.map((img) => (
+              <figure
+                key={img.imageKey}
+                className="rounded-xl overflow-hidden border border-zinc-800 bg-zinc-950"
+              >
+                <ResponsiveImage
+                  imageKey={img.imageKey}
+                  alt={img.alt}
+                  objectFit="contain"
+                />
+                {img.caption && (
+                  <figcaption className="p-3 text-xs text-zinc-400 border-t border-zinc-800">
+                    {img.caption}
+                  </figcaption>
+                )}
+              </figure>
+            ))}
+          </div>
+        </section>
+      )}
+    </div>
+  );
+}
+
+
+
+================================================================
+FILE: D:\OLER\COOLYEAH DEK\Portofolio\oler\aurell-portfolio\src\app\projects\page.tsx
+================================================================
+"use client";
+
+import React, { useState } from "react";
+import { projectsData } from "@/data/projects";
+import { SectionHeader } from "@/components/ui/SectionHeader";
+import { ProjectCard } from "@/components/cards/ProjectCard";
+
+export default function ProjectsPage() {
+  const [selectedCategory, setSelectedCategory] = useState<string>("All");
+
+  const categories = [
+    "All",
+    ...Array.from(new Set(projectsData.map((p) => p.category))),
+  ];
+
+  const filteredProjects =
+    selectedCategory === "All"
+      ? projectsData
+      : projectsData.filter((p) => p.category === selectedCategory);
+
+  return (
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-20 space-y-10">
+      <SectionHeader
+        eyebrow="Software Development Projects"
+        title="Arsip Proyek Perangkat Lunak"
+        description="Daftar proyek pengembangan sistem backend, REST API, manajemen basis data, dan aplikasi kolaboratif."
+      />
+
+      <div className="flex flex-wrap gap-2">
+        {categories.map((cat) => (
+          <button
+            key={cat}
+            type="button"
+            onClick={() => setSelectedCategory(cat)}
+            className={`px-3.5 py-1.5 rounded-lg text-xs font-mono border transition-colors ${
+              selectedCategory === cat
+                ? "bg-lime-400/15 text-lime-300 border-lime-400/40"
+                : "bg-zinc-900/70 text-zinc-400 border-zinc-800 hover:text-zinc-200"
+            }`}
+          >
+            {cat}
+          </button>
+        ))}
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {filteredProjects.map((project) => (
+          <ProjectCard key={project.slug} project={project} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+
+
+================================================================
+FILE: D:\OLER\COOLYEAH DEK\Portofolio\oler\aurell-portfolio\src\app\globals.css
+================================================================
+@import "tailwindcss";
+
+@theme {
+  --font-sans: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-mono), ui-monospace, SFMono-Regular, monospace;
+}
+
+:root {
+  --bg-primary: #0a0a0c;
+  --bg-secondary: #121216;
+  --bg-card: #16161b;
+  --border-subtle: #26262e;
+  --text-primary: #f4f4f6;
+  --text-secondary: #a1a1aa;
+  --text-muted: #71717a;
+  --accent: #a3e635;
+  --accent-teal: #2dd4bf;
+}
+
+html {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  scroll-behavior: smooth;
+}
+
+::selection {
+  background-color: rgba(163, 230, 53, 0.2);
+  color: #bef264;
+}
+
+
+
+================================================================
+FILE: D:\OLER\COOLYEAH DEK\Portofolio\oler\aurell-portfolio\src\app\layout.tsx
+================================================================
+import type { Metadata } from "next";
+import { Inter, JetBrains_Mono } from "next/font/google";
+import "./globals.css";
+import { Navbar } from "@/components/layout/Navbar";
+import { Footer } from "@/components/layout/Footer";
+import { profileData } from "@/data/profile";
+
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-sans",
+  display: "swap",
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-mono",
+  display: "swap",
+});
+
+export const metadata: Metadata = {
+  metadataBase: new URL("https://aurell-portfolio.vercel.app"),
+  title: {
+    default: `${profileData.fullName} — Software Developer Portfolio`,
+    template: `%s | ${profileData.fullName}`,
+  },
+  description: profileData.heroSubheadline,
+  openGraph: {
+    title: `${profileData.fullName} — Software Developer Portfolio`,
+    description: profileData.heroSubheadline,
+    url: "https://aurell-portfolio.vercel.app",
+    siteName: profileData.fullName,
+    locale: "id_ID",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `${profileData.fullName} — Software Developer`,
+    description: profileData.heroSubheadline,
+  },
+};
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <html lang="id" className={`${inter.variable} ${jetbrainsMono.variable}`}>
+      <body className="min-h-screen flex flex-col bg-[#0a0a0c] text-zinc-100 antialiased selection:bg-lime-400/20 selection:text-lime-300">
+        <Navbar />
+        <main className="flex-1">{children}</main>
+        <Footer />
+      </body>
+    </html>
+  );
+}
+
+
+
+================================================================
+FILE: D:\OLER\COOLYEAH DEK\Portofolio\oler\aurell-portfolio\src\app\not-found.tsx
+================================================================
+import React from "react";
+import Link from "next/link";
+
+export default function NotFound() {
+  return (
+    <div className="max-w-3xl mx-auto px-4 py-28 text-center space-y-6">
+      <p className="text-xs font-mono uppercase tracking-widest text-lime-400">
+        Error 404
+      </p>
+      <h1 className="text-3xl font-semibold text-zinc-100">
+        Halaman Tidak Ditemukan
+      </h1>
+      <p className="text-sm text-zinc-400 max-w-md mx-auto">
+        Rute yang Anda tuju tidak tersedia. Silakan kembali ke halaman utama portofolio.
+      </p>
+      <Link
+        href="/"
+        className="inline-block px-5 py-2.5 rounded-lg bg-lime-400 text-zinc-950 text-sm font-medium hover:bg-lime-300"
+      >
+        Kembali ke Beranda
+      </Link>
+    </div>
+  );
+}
+
+
+
+================================================================
+FILE: D:\OLER\COOLYEAH DEK\Portofolio\oler\aurell-portfolio\src\app\page.tsx
+================================================================
+import React from "react";
+import Link from "next/link";
+import { profileData } from "@/data/profile";
+import { projectsData } from "@/data/projects";
+import { experiencesData } from "@/data/experiences";
+import { photographyAlbums } from "@/data/photography";
+import { socialMediaWorks } from "@/data/social-media";
+import { personalSkillGroups, projectContextTechnologies } from "@/data/skills";
+import {
+  educationList,
+  certificationsList,
+  languageTestsList,
+} from "@/data/education";
+import { socialLinks } from "@/data/social-links";
+import { SectionHeader } from "@/components/ui/SectionHeader";
+import { ProjectCard } from "@/components/cards/ProjectCard";
+import { ExperienceCard } from "@/components/cards/ExperienceCard";
+import { Badge } from "@/components/ui/Badge";
+import { ResponsiveImage } from "@/components/ui/ResponsiveImage";
+import {
+  ArrowRight,
+  ArrowUpRight,
+  Camera,
+  Code2,
+  Download,
+  GraduationCap,
+  Layers,
+  Terminal,
+} from "lucide-react";
+
+export default function HomePage() {
+  // Batasan jumlah item di Homepage sesuai requirement:
+  // Featured Projects max 3, Experiences max 4, Photography max 6, Social Media max 6
+  const featuredProjects = projectsData
+    .filter((p) => p.featured)
+    .slice(0, 3);
+  const displayedProjects =
+    featuredProjects.length > 0 ? featuredProjects : projectsData.slice(0, 3);
+
+  const featuredExperiences = experiencesData
+    .filter((e) => e.featured)
+    .slice(0, 4);
+
+  const previewPhotos = photographyAlbums
+    .flatMap((album) =>
+      album.images.map((img) => ({ ...img, albumTitle: album.title }))
+    )
+    .slice(0, 6);
+
+  const previewSocialWorks = socialMediaWorks.slice(0, 6);
+
+  return (
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 space-y-24 py-12 sm:py-20">
+      {/* A. HERO SECTION */}
+      <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+        <div className="lg:col-span-8 rounded-2xl border border-zinc-800/90 bg-[#121216] p-7 sm:p-10 flex flex-col justify-between space-y-8">
+          <div className="space-y-4">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-lime-400/10 border border-lime-400/30 text-lime-300 text-xs font-mono">
+              <Terminal className="w-3.5 h-3.5" />
+              <span>{profileData.professionalIdentity}</span>
+            </div>
+
+            <h1 className="text-3xl sm:text-5xl font-semibold tracking-tight text-zinc-100 leading-[1.15]">
+              {profileData.fullName}
+            </h1>
+
+            <p className="text-sm font-mono text-zinc-400">
+              {profileData.academicIdentity}
+            </p>
+
+            <p className="text-lg sm:text-xl text-zinc-200 font-medium leading-relaxed pt-2">
+              {profileData.heroHeadline}
+            </p>
+
+            <p className="text-sm sm:text-base text-zinc-400 leading-relaxed">
+              {profileData.shortIntroduction}
+            </p>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-3 pt-2">
+            <Link
+              href="/projects"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-lime-400 text-zinc-950 font-medium text-sm hover:bg-lime-300 transition-colors"
+            >
+              <span>Lihat Proyek</span>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+
+            <Link
+              href="/contact"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-zinc-100 border border-zinc-700/80 text-sm font-medium transition-colors"
+            >
+              <span>Hubungi Saya</span>
+            </Link>
+
+            {profileData.cvUrl && (
+              <a
+                href={profileData.cvUrl}
+                download
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-transparent hover:bg-zinc-900 text-zinc-300 border border-zinc-800 text-sm font-mono transition-colors"
+              >
+                <Download className="w-4 h-4" />
+                <span>Unduh CV</span>
+              </a>
+            )}
+          </div>
+        </div>
+
+        {/* Profile Monogram / Photo Bento Card */}
+        <div className="lg:col-span-4 rounded-2xl border border-zinc-800/90 bg-[#121216] p-7 flex flex-col justify-between">
+          {profileData.profileImageKey ? (
+            <div className="aspect-[4/5] w-full rounded-xl overflow-hidden border border-zinc-800 mb-6">
+              <ResponsiveImage
+                imageKey={profileData.profileImageKey}
+                alt={profileData.fullName}
+                priority
+              />
+            </div>
+          ) : (
+            <div className="flex-1 min-h-[220px] rounded-xl border border-zinc-800/80 bg-zinc-950/80 flex flex-col items-center justify-center p-6 text-center mb-6">
+              <span className="text-4xl sm:text-5xl font-mono font-semibold tracking-tighter text-lime-400">
+                {profileData.monogram}
+              </span>
+              <span className="text-xs font-mono text-zinc-500 mt-3 uppercase tracking-widest">
+                {profileData.location}
+              </span>
+            </div>
+          )}
+
+          <div className="space-y-3 border-t border-zinc-800/80 pt-5 text-xs font-mono">
+            <div className="flex justify-between text-zinc-400">
+              <span>Fokus Utama</span>
+              <span className="text-zinc-200 text-right">Backend & System Dev</span>
+            </div>
+            <div className="flex justify-between text-zinc-400">
+              <span>Institusi</span>
+              <span className="text-zinc-200 text-right">UGM (2025–Sekarang)</span>
+            </div>
+            <div className="flex justify-between text-zinc-400">
+              <span>Domisili</span>
+              <span className="text-zinc-200 text-right">{profileData.location}</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* B. ABOUT PREVIEW */}
+      <section className="rounded-2xl border border-zinc-800/90 bg-[#121216] p-7 sm:p-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+        <div className="lg:col-span-4 space-y-2">
+          <p className="text-xs font-mono uppercase tracking-[0.2em] text-lime-400">
+            01 / Who Am I
+          </p>
+          <h2 className="text-2xl font-semibold text-zinc-100">
+            Latar Belakang & Pendekatan Kerja
+          </h2>
+        </div>
+        <div className="lg:col-span-8 space-y-4">
+          <p className="text-zinc-300 text-sm sm:text-base leading-relaxed">
+            {profileData.aboutSections.personalIntroduction[0]}{" "}
+            {profileData.aboutSections.workingApproach[0]}
+          </p>
+          <Link
+            href="/about"
+            className="inline-flex items-center gap-1.5 text-sm font-mono text-lime-400 hover:text-lime-300"
+          >
+            <span>Baca profil selengkapnya</span>
+            <ArrowUpRight className="w-4 h-4" />
+          </Link>
+        </div>
+      </section>
+
+      {/* C. FEATURED PROJECTS */}
+      <section className="space-y-8">
+        <SectionHeader
+          eyebrow="02 / Software Engineering"
+          title="Proyek Perangkat Lunak Pilihan"
+          description="Dokumentasi pengembangan sistem backend, perancangan REST API, skema database, dan kolaborasi pengembangan aplikasi."
+          actionHref="/projects"
+          actionLabel={`Lihat Semua Proyek (${projectsData.length})`}
+        />
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {displayedProjects.map((project) => (
+            <ProjectCard key={project.slug} project={project} />
+          ))}
+        </div>
+      </section>
+
+      {/* D. EXPERIENCE PREVIEW */}
+      <section className="space-y-8">
+        <SectionHeader
+          eyebrow="03 / Organizations & Committees"
+          title="Pengalaman Organisasi & Kepanitiaan"
+          description="Peran operasional, teknis, manajemen logistik, serta pengelolaan media dan komunikasi di lingkungan Universitas Gadjah Mada dan organisasi."
+          actionHref="/experience"
+          actionLabel={`Lihat Semua Pengalaman (${experiencesData.length})`}
+        />
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {featuredExperiences.map((exp) => (
+            <ExperienceCard key={exp.slug} experience={exp} />
+          ))}
+        </div>
+      </section>
+
+      {/* E. CREATIVE WORKS PREVIEW */}
+      <section className="space-y-8">
+        <SectionHeader
+          eyebrow="04 / Visual & Media"
+          title="Karya Kreatif & Dokumentasi Visual"
+          description="Terbagi ke dalam dua fokus utama: Fotografi kegiatan lapangan/alam dan pengelolaan konten publikasi media sosial."
+          actionHref="/creative-works"
+          actionLabel="Buka Galeri Creative Works"
+        />
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Photography Preview Card */}
+          <div className="rounded-xl border border-zinc-800/90 bg-[#121216] p-6 flex flex-col justify-between space-y-6">
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="inline-flex items-center gap-2 text-xs font-mono text-lime-400">
+                  <Camera className="w-4 h-4" />
+                  <span>Kategori 01 · Photography</span>
+                </span>
+                <span className="text-xs font-mono text-zinc-500">
+                  {photographyAlbums.length} Album Koleksi
+                </span>
+              </div>
+              <h3 className="text-xl font-semibold text-zinc-100">
+                Fotografi Alam, Gunung Hutan & Dokumentasi Kegiatan
+              </h3>
+              <p className="text-sm text-zinc-400 leading-relaxed">
+                Menampilkan dokumentasi kegiatan operasional lapangan, aktivitas panjat tebing, serta lanskap alam dengan mempertahankan rasio asli foto.
+              </p>
+
+              {previewPhotos.length > 0 ? (
+              <div className="grid grid-cols-2 gap-3 pt-2">
+                {previewPhotos.slice(0, 4).map((p, idx) => (
+                  <div
+                    key={idx}
+                    className="aspect-[3/2] w-full rounded-lg overflow-hidden border border-zinc-800/80 bg-zinc-950 group"
+                  >
+                    <ResponsiveImage
+                      imageKey={p.imageKey}
+                      alt={p.alt}
+                      objectFit="cover"
+                      imgClassName="group-hover:scale-105 transition-transform duration-500 ease-out"
+                    />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="rounded-lg bg-zinc-950/70 border border-zinc-800/80 p-4 text-xs text-zinc-400 space-y-1">
+                <p className="font-mono text-zinc-300">
+                  Album Terdaftar ({photographyAlbums.map((a) => a.title).join(", ")})
+                </p>
+                <p className="text-zinc-500">
+                  Siap menampilkan foto teroptimasi AVIF/WebP begitu file dimasukkan ke{" "}
+                  <code>source-images/photography/</code>.
+                </p>
+              </div>
+            )}
+            </div>
+
+            <Link
+              href="/creative-works/photography"
+              className="inline-flex items-center gap-1.5 text-xs font-mono uppercase tracking-wider text-lime-400 hover:text-lime-300"
+            >
+              <span>Jelajahi Galeri Fotografi</span>
+              <ArrowUpRight className="w-4 h-4" />
+            </Link>
+          </div>
+
+          {/* Social Media Preview Card */}
+          <div className="rounded-xl border border-zinc-800/90 bg-[#121216] p-6 flex flex-col justify-between space-y-6">
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="inline-flex items-center gap-2 text-xs font-mono text-lime-400">
+                  <Layers className="w-4 h-4" />
+                  <span>Kategori 02 · Social Media Content</span>
+                </span>
+                <span className="text-xs font-mono text-zinc-500">
+                  {previewSocialWorks.length} Rangkaian Karya
+                </span>
+              </div>
+              <h3 className="text-xl font-semibold text-zinc-100">
+                Publikasi Media Sosial & Dokumentasi Visual Organisasi
+              </h3>
+              <p className="text-sm text-zinc-400 leading-relaxed">
+                Pengelolaan feed, carousel informasi kegiatan GLADIMULA XLIII, serta dokumentasi lapangan gunung hutan bersama tim media MAPAGAMA.
+              </p>
+
+              <div className="space-y-2 pt-2">
+                {previewSocialWorks.map((work) => (
+                  <div
+                    key={work.slug}
+                    className="rounded-lg bg-zinc-950/70 border border-zinc-800/80 p-3 flex items-center justify-between gap-2"
+                  >
+                    <div>
+                      <p className="text-xs font-medium text-zinc-200">
+                        {work.title}
+                      </p>
+                      <p className="text-[11px] font-mono text-zinc-500">
+                        {work.campaignOrEvent} · {work.period}
+                      </p>
+                    </div>
+                    <Badge variant="default">{work.contentType}</Badge>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <Link
+              href="/creative-works/social-media"
+              className="inline-flex items-center gap-1.5 text-xs font-mono uppercase tracking-wider text-lime-400 hover:text-lime-300"
+            >
+              <span>Lihat Karya Media Sosial</span>
+              <ArrowUpRight className="w-4 h-4" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* F. SKILLS PREVIEW */}
+      <section className="space-y-8">
+        <SectionHeader
+          eyebrow="05 / Technical Capabilities"
+          title="Kemampuan Teknis & Ekosistem Perangkat"
+          description="Dikelompokkan berdasarkan pengalaman langsung pada pengembangan proyek dan dipisahkan secara transparan dari stack tim."
+        />
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {personalSkillGroups.map((group) => (
+            <div
+              key={group.category}
+              className="rounded-xl border border-zinc-800/90 bg-[#121216] p-6 space-y-4"
+            >
+              <div className="space-y-1">
+                <h3 className="text-base font-semibold text-zinc-100 flex items-center gap-2">
+                  <Code2 className="w-4 h-4 text-lime-400" />
+                  <span>{group.category}</span>
+                </h3>
+                <p className="text-xs text-zinc-400">{group.description}</p>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {group.skills.map((skill) => (
+                  <Badge key={skill} variant="accent">
+                    {skill}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="rounded-xl border border-zinc-800/70 bg-zinc-950/60 p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="space-y-1">
+            <p className="text-xs font-mono uppercase tracking-wider text-zinc-400">
+              Teknologi dalam Konteks Proyek Kolaboratif
+            </p>
+            <p className="text-xs text-zinc-500">
+              Teknologi berikut digunakan dalam lingkungan proyek bersama tim atau eksplorasi integrasi fitur:
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-1.5">
+            {projectContextTechnologies.map((tech) => (
+              <Badge key={tech} variant="outline">
+                {tech}
+              </Badge>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* G. EDUCATION & CERTIFICATIONS PREVIEW */}
+      <section className="space-y-8">
+        <SectionHeader
+          eyebrow="06 / Academic & Credentials"
+          title="Pendidikan, Sertifikasi & Uji Bahasa"
+          actionHref="/education"
+          actionLabel="Halaman Pendidikan"
+        />
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {educationList.map((edu) => (
+            <div
+              key={edu.degree}
+              className="rounded-xl border border-zinc-800/90 bg-[#121216] p-6 space-y-2"
+            >
+              <span className="text-xs font-mono text-lime-400 flex items-center gap-1.5">
+                <GraduationCap className="w-4 h-4" />
+                <span>Pendidikan Tinggi ({edu.period})</span>
+              </span>
+              <h3 className="text-base font-semibold text-zinc-100">
+                {edu.degree}
+              </h3>
+              <p className="text-sm text-zinc-300">{edu.institution}</p>
+            </div>
+          ))}
+
+          {certificationsList.map((cert) => (
+            <div
+              key={cert.title}
+              className="rounded-xl border border-zinc-800/90 bg-[#121216] p-6 space-y-2"
+            >
+              <span className="text-xs font-mono text-lime-400">
+                Sertifikasi Kompetensi
+              </span>
+              <h3 className="text-base font-semibold text-zinc-100">
+                {cert.title}
+              </h3>
+              <p className="text-sm text-zinc-400">{cert.issuer}</p>
+              {cert.year && (
+                <p className="text-xs text-zinc-500">
+                  Tahun: {cert.year}
+                </p>
+              )}
+            </div>
+          ))}
+
+          {languageTestsList.map((test) => (
+            <div
+              key={test.testName}
+              className="rounded-xl border border-zinc-800/90 bg-[#121216] p-6 space-y-2"
+            >
+              <span className="text-xs font-mono text-lime-400">
+                English Proficiency Test
+              </span>
+              <h3 className="text-base font-semibold text-zinc-100">
+                {test.testName} — Skor {test.score}
+              </h3>
+              <p className="text-sm text-zinc-400">{test.organizer}</p>
+
+              {test.year && (
+                <p className="text-xs text-zinc-500">
+                  Tahun: {test.year}
+                </p>
+              )}
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* H. CONTACT CTA */}
+      <section className="rounded-2xl border border-zinc-800 bg-gradient-to-br from-[#121216] to-[#0d0d11] p-8 sm:p-12 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+        <div className="space-y-2 max-w-xl">
+          <p className="text-xs font-mono uppercase tracking-[0.2em] text-lime-400">
+            07 / Collaboration
+          </p>
+          <h2 className="text-2xl sm:text-3xl font-semibold text-zinc-100">
+            Terbuka untuk Diskusi Proyek & Kolaborasi Teknis
+          </h2>
+          <p className="text-sm text-zinc-400 leading-relaxed">
+            Ingin berdiskusi mengenai pengembangan sistem backend, kolaborasi proyek perangkat lunak, atau kegiatan komunitas? Silakan terhubung melalui kanal yang tersedia.
+          </p>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-3">
+          <Link
+            href="/contact"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-lime-400 text-zinc-950 font-medium text-sm hover:bg-lime-300 transition-colors"
+          >
+            <span>Halaman Kontak</span>
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+          {socialLinks.map((link) => (
+            <a
+              key={link.platform}
+              href={link.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-lg bg-zinc-900 border border-zinc-700 text-zinc-200 hover:border-lime-400 text-sm font-mono transition-colors"
+            >
+              <span>{link.label}</span>
+              <ArrowUpRight className="w-4 h-4" />
+            </a>
+          ))}
+        </div>
+      </section>
+    </div>
+  );
+}
+
+
+
+================================================================
+FILE: D:\OLER\COOLYEAH DEK\Portofolio\oler\aurell-portfolio\src\app\robots.ts
+================================================================
+// src/app/robots.ts
+import type { MetadataRoute } from "next";
+
+export const dynamic = "force-static";
+
+export default function robots(): MetadataRoute.Robots {
+  return {
+    rules: {
+      userAgent: "*",
+      allow: "/",
+    },
+    sitemap: "https://aurell-portfolio.vercel.app/sitemap.xml",
+  };
+}
+
+
+
+================================================================
+FILE: D:\OLER\COOLYEAH DEK\Portofolio\oler\aurell-portfolio\src\app\sitemap.ts
+================================================================
+import type { MetadataRoute } from "next";
+import { projectsData } from "@/data/projects";
+import { experiencesData } from "@/data/experiences";
+
+export const dynamic = "force-static";
+
+export default function sitemap(): MetadataRoute.Sitemap {
+  const baseUrl = "https://aurell-portfolio.vercel.app";
+
+  const staticRoutes = [
+    "",
+    "/about",
+    "/projects",
+    "/experience",
+    "/creative-works",
+    "/creative-works/photography",
+    "/creative-works/social-media",
+    "/education",
+    "/contact",
+  ].map((route) => ({
+    url: `${baseUrl}${route}`,
+    lastModified: new Date(),
+  }));
+
+  const projectRoutes = projectsData.map((p) => ({
+    url: `${baseUrl}/projects/${p.slug}`,
+    lastModified: new Date(),
+  }));
+
+  const experienceRoutes = experiencesData.map((e) => ({
+    url: `${baseUrl}/experience/${e.slug}`,
+    lastModified: new Date(),
+  }));
+
+  return [...staticRoutes, ...projectRoutes, ...experienceRoutes];
+}
+
+
+
+================================================================
+FILE: D:\OLER\COOLYEAH DEK\Portofolio\oler\aurell-portfolio\src\components\cards\ExperienceCard.tsx
+================================================================
+import React from "react";
+import Link from "next/link";
+import { ExperienceItem } from "@/types/portfolio";
+import { Badge } from "@/components/ui/Badge";
+import { ArrowUpRight } from "lucide-react";
+
+interface ExperienceCardProps {
+  experience: ExperienceItem;
+}
+
+export function ExperienceCard({ experience }: ExperienceCardProps) {
+  return (
+    <article className="rounded-xl border border-zinc-800/90 bg-[#121216] hover:border-zinc-700 transition-all p-6 flex flex-col justify-between gap-5">
+      <div className="space-y-3">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <Badge variant={experience.isCurrent ? "accent" : "outline"}>
+              {experience.isCurrent ? "Active · " : ""}
+              {experience.period}
+            </Badge>
+            <Badge variant="default">
+              {experience.category === "organizational"
+                ? "Organisasi"
+                : "Kepanitiaan & Program"}
+            </Badge>
+          </div>
+        </div>
+
+        <div>
+          <h3 className="text-lg font-semibold text-zinc-100">
+            <Link
+              href={`/experience/${experience.slug}`}
+              className="hover:text-lime-300 transition-colors"
+            >
+              {experience.position}
+            </Link>
+          </h3>
+          <p className="text-sm text-zinc-300 font-medium mt-0.5">
+            {experience.programName
+              ? `${experience.programName} — ${experience.organization}`
+              : experience.organization}
+          </p>
+        </div>
+
+        <p className="text-sm text-zinc-400 leading-relaxed">
+          {experience.description}
+        </p>
+
+        {experience.responsibilities.length > 0 && (
+          <ul className="space-y-1.5 pt-1 text-xs text-zinc-400 list-disc list-inside">
+            {experience.responsibilities.slice(0, 4).map((item) => (
+              <li key={item} className="leading-relaxed">
+                {item}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
+      <div className="pt-3 border-t border-zinc-800/70 flex items-center justify-between">
+        <Link
+          href={`/experience/${experience.slug}`}
+          className="inline-flex items-center gap-1.5 text-xs font-mono uppercase tracking-wider text-zinc-300 hover:text-lime-400 transition-colors"
+        >
+          <span>Lihat Rincian Tanggung Jawab</span>
+          <ArrowUpRight className="w-3.5 h-3.5" />
+        </Link>
+      </div>
+    </article>
+  );
+}
+
+
+
+================================================================
+FILE: D:\OLER\COOLYEAH DEK\Portofolio\oler\aurell-portfolio\src\components\cards\ProjectCard.tsx
+================================================================
+import React from "react";
+import Link from "next/link";
+import { ProjectItem } from "@/types/portfolio";
+import { Badge } from "@/components/ui/Badge";
+import { ResponsiveImage } from "@/components/ui/ResponsiveImage";
+import { ArrowUpRight, GitBranch } from "lucide-react";
+
+interface ProjectCardProps {
+  project: ProjectItem;
+}
+
+export function ProjectCard({ project }: ProjectCardProps) {
+  const allTech = [
+    ...project.technologies.personalContribution,
+    ...(project.technologies.teamOrContext || []),
+  ];
+
+  return (
+    <article className="group rounded-xl border border-zinc-800/90 bg-[#121216] hover:border-zinc-700 transition-all flex flex-col justify-between overflow-hidden">
+      <div>
+        {project.thumbnail ? (
+          <div className="aspect-[16/9] w-full overflow-hidden border-b border-zinc-800/80 bg-zinc-950">
+            <ResponsiveImage
+              imageKey={project.thumbnail}
+              alt={project.title}
+              imgClassName="group-hover:scale-[1.02]"
+            />
+          </div>
+        ) : (
+          <div className="px-6 pt-6 flex items-center justify-between">
+            <span className="text-xs font-mono text-lime-400">
+              {project.category}
+            </span>
+            <span className="text-xs font-mono text-zinc-500">
+              {project.period}
+            </span>
+          </div>
+        )}
+
+        <div className="p-6 space-y-4">
+          {project.thumbnail && (
+            <div className="flex items-center justify-between text-xs font-mono text-zinc-400">
+              <span className="text-lime-400">{project.category}</span>
+              <span>{project.period}</span>
+            </div>
+          )}
+
+          <div>
+            <h3 className="text-xl font-semibold text-zinc-100 group-hover:text-lime-300 transition-colors">
+              <Link href={`/projects/${project.slug}`} className="focus:outline-none">
+                {project.title}
+              </Link>
+            </h3>
+            <p className="text-xs font-mono text-zinc-400 mt-1">
+              Role: <span className="text-zinc-200">{project.role}</span>
+            </p>
+          </div>
+
+          <p className="text-sm text-zinc-400 leading-relaxed">
+            {project.description}
+          </p>
+
+          <div className="flex flex-wrap gap-1.5 pt-1">
+            {allTech.slice(0, 6).map((tech) => (
+              <Badge key={tech} variant="default">
+                {tech}
+              </Badge>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="px-6 py-4 border-t border-zinc-800/70 bg-zinc-950/40 flex items-center justify-between">
+        <Link
+          href={`/projects/${project.slug}`}
+          className="inline-flex items-center gap-1.5 text-xs font-mono uppercase tracking-wider text-zinc-200 hover:text-lime-400 transition-colors"
+        >
+          <span>Detail Proyek</span>
+          <ArrowUpRight className="w-3.5 h-3.5" />
+        </Link>
+
+        {project.githubUrl && (
+          <a
+            href={project.githubUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 text-xs font-mono text-zinc-400 hover:text-zinc-200 transition-colors"
+          >
+            <GitBranch className="w-3.5 h-3.5" />
+            <span>Repository</span>
+          </a>
+        )}
+      </div>
+    </article>
+  );
+}
+
+
+
+================================================================
+FILE: D:\OLER\COOLYEAH DEK\Portofolio\oler\aurell-portfolio\src\components\gallery\Lightbox.tsx
+================================================================
+"use client";
+
+import React, { useEffect, useCallback } from "react";
+import { X, ChevronLeft, ChevronRight } from "lucide-react";
+import { ResponsiveImage } from "@/components/ui/ResponsiveImage";
+
+export interface LightboxSlide {
+  imageKey: string;
+  alt: string;
+  caption?: string;
+  meta?: string;
+}
+
+interface LightboxProps {
+  slides: LightboxSlide[];
+  activeIndex: number | null;
+  onClose: () => void;
+  onChangeIndex: (newIndex: number) => void;
+}
+
+export function Lightbox({
+  slides,
+  activeIndex,
+  onClose,
+  onChangeIndex,
+}: LightboxProps) {
+  const isOpen = activeIndex !== null && activeIndex >= 0 && activeIndex < slides.length;
+
+  const handlePrev = useCallback(() => {
+    if (activeIndex === null) return;
+    onChangeIndex((activeIndex - 1 + slides.length) % slides.length);
+  }, [activeIndex, slides.length, onChangeIndex]);
+
+  const handleNext = useCallback(() => {
+    if (activeIndex === null) return;
+    onChangeIndex((activeIndex + 1) % slides.length);
+  }, [activeIndex, slides.length, onChangeIndex]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+      if (e.key === "ArrowLeft") handlePrev();
+      if (e.key === "ArrowRight") handleNext();
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen, onClose, handlePrev, handleNext]);
+
+  if (!isOpen || activeIndex === null) return null;
+
+  const current = slides[activeIndex];
+
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label="Image Lightbox"
+      className="fixed inset-0 z-50 bg-black/95 backdrop-blur-sm flex flex-col justify-between p-4 sm:p-6"
+    >
+      <div className="flex items-center justify-between text-xs font-mono text-zinc-400">
+        <span>
+          {activeIndex + 1} / {slides.length}
+        </span>
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Close Lightbox"
+          className="p-2 rounded-lg bg-zinc-900 border border-zinc-800 text-zinc-200 hover:border-lime-400 transition-colors"
+        >
+          <X className="w-5 h-5" />
+        </button>
+      </div>
+
+      <div className="relative flex-1 flex items-center justify-center my-4 overflow-hidden">
+        {slides.length > 1 && (
+          <button
+            type="button"
+            onClick={handlePrev}
+            aria-label="Previous Image"
+            className="absolute left-2 sm:left-6 z-10 p-2.5 rounded-full bg-zinc-900/90 border border-zinc-700 text-zinc-100 hover:border-lime-400 transition-colors"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+        )}
+
+        <div className="max-h-[78vh] max-w-5xl w-full h-full flex items-center justify-center">
+          <ResponsiveImage
+            imageKey={current.imageKey}
+            alt={current.alt}
+            sizes="100vw"
+            objectFit="contain"
+            className="w-full h-full flex items-center justify-center"
+            imgClassName="max-h-[78vh] w-auto h-auto mx-auto object-contain"
+          />
+        </div>
+
+        {slides.length > 1 && (
+          <button
+            type="button"
+            onClick={handleNext}
+            aria-label="Next Image"
+            className="absolute right-2 sm:right-6 z-10 p-2.5 rounded-full bg-zinc-900/90 border border-zinc-700 text-zinc-100 hover:border-lime-400 transition-colors"
+          >
+            <ChevronRight className="w-5 h-5" />
+          </button>
+        )}
+      </div>
+
+      {(current.caption || current.meta) && (
+        <div className="max-w-2xl mx-auto text-center space-y-1 pb-2">
+          {current.caption && (
+            <p className="text-sm text-zinc-200">{current.caption}</p>
+          )}
+          {current.meta && (
+            <p className="text-xs font-mono text-zinc-500">{current.meta}</p>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+
+
+================================================================
+FILE: D:\OLER\COOLYEAH DEK\Portofolio\oler\aurell-portfolio\src\components\gallery\PhotographyGallery.tsx
+================================================================
+"use client";
+
+import React, { useState } from "react";
+import { PhotographyAlbum } from "@/types/portfolio";
+import { ResponsiveImage } from "@/components/ui/ResponsiveImage";
+import { Lightbox, LightboxSlide } from "@/components/gallery/Lightbox";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { Badge } from "@/components/ui/Badge";
+
+interface PhotographyGalleryProps {
+  albums: PhotographyAlbum[];
+}
+
+export function PhotographyGallery({ albums }: PhotographyGalleryProps) {
+  const [selectedCategory, setSelectedCategory] = useState<string>("All");
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+
+  const categories = ["All", ...Array.from(new Set(albums.map((a) => a.category)))];
+
+  const filteredAlbums =
+    selectedCategory === "All"
+      ? albums
+      : albums.filter((a) => a.category === selectedCategory);
+
+  const flatPhotos: (LightboxSlide & { albumTitle: string })[] = filteredAlbums.flatMap(
+    (album) =>
+      album.images.map((img) => ({
+        imageKey: img.imageKey,
+        alt: img.alt,
+        caption: img.caption || album.title,
+        meta: [album.title, img.location || album.location, img.date || album.date]
+          .filter(Boolean)
+          .join(" · "),
+        albumTitle: album.title,
+      }))
+  );
+
+  return (
+    <div className="space-y-8">
+      {/* Filter Kategori Album */}
+      <div className="flex flex-wrap gap-2">
+        {categories.map((cat) => (
+          <button
+            key={cat}
+            type="button"
+            onClick={() => setSelectedCategory(cat)}
+            className={`px-3.5 py-1.5 rounded-lg text-xs font-mono transition-colors border ${
+              selectedCategory === cat
+                ? "bg-lime-400/15 text-lime-300 border-lime-400/40"
+                : "bg-zinc-900/70 text-zinc-400 border-zinc-800 hover:text-zinc-200"
+            }`}
+          >
+            {cat}
+          </button>
+        ))}
+      </div>
+
+      {/* Daftar Struktur Album */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {filteredAlbums.map((album) => (
+          <div
+            key={album.slug}
+            className="rounded-xl border border-zinc-800/80 bg-[#121216] p-5 flex flex-col justify-between gap-4"
+          >
+            <div className="space-y-2">
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-xs font-mono text-lime-400">
+                  {album.category}
+                </span>
+                <span className="text-xs font-mono text-zinc-500">
+                  {album.images.length} Foto
+                </span>
+              </div>
+              <h3 className="text-base font-semibold text-zinc-100">
+                {album.title}
+              </h3>
+              <p className="text-xs text-zinc-400 leading-relaxed">
+                {album.description}
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-1.5">
+              {album.tags.map((tag) => (
+                <Badge key={tag}>{tag}</Badge>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Masonry Grid Foto */}
+      {flatPhotos.length > 0 ? (
+        <div className="columns-1 sm:columns-2 lg:columns-3 gap-4 space-y-4">
+          {flatPhotos.map((photo, idx) => (
+            <figure
+              key={`${photo.imageKey}-${idx}`}
+              className="break-inside-avoid group relative rounded-xl overflow-hidden border border-zinc-800/80 bg-zinc-950 cursor-pointer"
+              onClick={() => setLightboxIndex(idx)}
+            >
+              <ResponsiveImage
+                imageKey={photo.imageKey}
+                alt={photo.alt}
+                objectFit="contain"
+                imgClassName="w-full h-auto group-hover:scale-[1.015]"
+              />
+              <figcaption className="p-3 bg-zinc-950/90 border-t border-zinc-800/60 flex items-center justify-between gap-2">
+                <span className="text-xs text-zinc-300 truncate">
+                  {photo.caption}
+                </span>
+                <span className="text-[11px] font-mono text-zinc-500 shrink-0">
+                  {photo.albumTitle}
+                </span>
+              </figcaption>
+            </figure>
+          ))}
+        </div>
+      ) : (
+        <EmptyState
+          title="Koleksi Album Siap Menerima File Foto"
+          description="Struktur album fotografi di atas telah siap. Belum ada file foto yang diunggah agar tidak menggunakan gambar stock. Masukkan foto asli berukuran 10–20 MB ke dalam folder source-images/photography/ lalu jalankan perintah optimasi."
+          hintCommand="npm run images:optimize"
+        />
+      )}
+
+      <Lightbox
+        slides={flatPhotos}
+        activeIndex={lightboxIndex}
+        onClose={() => setLightboxIndex(null)}
+        onChangeIndex={setLightboxIndex}
+      />
+    </div>
+  );
+}
+
+
+
+================================================================
+FILE: D:\OLER\COOLYEAH DEK\Portofolio\oler\aurell-portfolio\src\components\gallery\SocialMediaGallery.tsx
+================================================================
+"use client";
+
+import React, { useState } from "react";
+import { SocialMediaWork } from "@/types/portfolio";
+import { ResponsiveImage } from "@/components/ui/ResponsiveImage";
+import { Badge } from "@/components/ui/Badge";
+import { Lightbox, LightboxSlide } from "@/components/gallery/Lightbox";
+import { ChevronLeft, ChevronRight, Maximize2 } from "lucide-react";
+
+interface SocialMediaGalleryProps {
+  works: SocialMediaWork[];
+}
+
+export function SocialMediaGallery({ works }: SocialMediaGalleryProps) {
+  const [carouselIndices, setCarouselIndices] = useState<Record<string, number>>({});
+  const [lightboxSlides, setLightboxSlides] = useState<LightboxSlide[]>([]);
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+
+  const getIndex = (slug: string) => carouselIndices[slug] || 0;
+
+  const stepCarousel = (slug: string, total: number, delta: number) => {
+    setCarouselIndices((prev) => {
+      const current = prev[slug] || 0;
+      return {
+        ...prev,
+        [slug]: (current + delta + total) % total,
+      };
+    });
+  };
+
+  const openWorkLightbox = (work: SocialMediaWork, startIndex: number) => {
+    const slides: LightboxSlide[] = work.images.map((img) => ({
+      imageKey: img.imageKey,
+      alt: img.alt,
+      caption: img.caption || work.title,
+      meta: `${work.campaignOrEvent} (${work.period})`,
+    }));
+    setLightboxSlides(slides);
+    setLightboxIndex(startIndex);
+  };
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {works.map((work) => {
+        const totalImages = work.images.length;
+        const currentIdx = getIndex(work.slug);
+        const activeImage = totalImages > 0 ? work.images[currentIdx] : null;
+
+        return (
+          <article
+            key={work.slug}
+            className="rounded-xl border border-zinc-800/90 bg-[#121216] overflow-hidden flex flex-col justify-between"
+          >
+            <div>
+              {/* Visual Preview Area dengan object-fit: contain agar desain tidak terpotong */}
+              <div className="relative bg-zinc-950 border-b border-zinc-800/80 min-h-[260px] flex items-center justify-center p-4">
+                {activeImage ? (
+                  <>
+                    <div
+                      onClick={() => openWorkLightbox(work, currentIdx)}
+                      className="w-full max-h-[380px] flex items-center justify-center cursor-pointer"
+                    >
+                      <ResponsiveImage
+                        imageKey={activeImage.imageKey}
+                        alt={activeImage.alt}
+                        objectFit="contain"
+                        imgClassName="max-h-[360px] w-auto h-auto mx-auto object-contain"
+                      />
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => openWorkLightbox(work, currentIdx)}
+                      aria-label="Perbesar Desain"
+                      className="absolute top-3 right-3 p-2 rounded-md bg-zinc-900/90 border border-zinc-700 text-zinc-200 hover:border-lime-400"
+                    >
+                      <Maximize2 className="w-4 h-4" />
+                    </button>
+
+                    {totalImages > 1 && (
+                      <div className="absolute bottom-3 inset-x-3 flex items-center justify-between pointer-events-none">
+                        <button
+                          type="button"
+                          onClick={() => stepCarousel(work.slug, totalImages, -1)}
+                          aria-label="Slide Sebelumnya"
+                          className="pointer-events-auto p-1.5 rounded-md bg-zinc-900/90 border border-zinc-700 text-zinc-200 hover:border-lime-400"
+                        >
+                          <ChevronLeft className="w-4 h-4" />
+                        </button>
+                        <span className="px-2.5 py-1 rounded bg-zinc-900/90 border border-zinc-800 text-[11px] font-mono text-zinc-300">
+                          Slide {currentIdx + 1} / {totalImages}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => stepCarousel(work.slug, totalImages, 1)}
+                          aria-label="Slide Berikutnya"
+                          className="pointer-events-auto p-1.5 rounded-md bg-zinc-900/90 border border-zinc-700 text-zinc-200 hover:border-lime-400"
+                        >
+                          <ChevronRight className="w-4 h-4" />
+                        </button>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div className="text-center p-6 space-y-2 max-w-sm">
+                    <span className="inline-block text-xs font-mono uppercase tracking-wider text-lime-400/90">
+                      {work.contentType}
+                    </span>
+                    <p className="text-xs text-zinc-500">
+                      Preview visual akan tampil secara utuh (tanpa crop) setelah file desain dioptimasi ke folder{" "}
+                      <code className="text-zinc-400">source-images/social-media/</code>.
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* Informasi Konten & Transparansi Peran */}
+              <div className="p-6 space-y-4">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <Badge variant="accent">{work.contentType}</Badge>
+                  <Badge variant="default">{work.ownershipType}</Badge>
+                </div>
+
+                <div>
+                  <p className="text-xs font-mono text-zinc-400">
+                    {work.campaignOrEvent} · {work.period}
+                  </p>
+                  <h3 className="text-lg font-semibold text-zinc-100 mt-1">
+                    {work.title}
+                  </h3>
+                </div>
+
+                <p className="text-sm text-zinc-400 leading-relaxed">
+                  {work.description}
+                </p>
+
+                <div className="rounded-lg bg-zinc-950/70 border border-zinc-800/80 p-3.5 space-y-1">
+                  <p className="text-[11px] font-mono uppercase tracking-wider text-zinc-500">
+                    Peran & Kontribusi
+                  </p>
+                  <p className="text-xs text-zinc-300 leading-relaxed">
+                    {work.roleAndContribution}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </article>
+        );
+      })}
+
+      <Lightbox
+        slides={lightboxSlides}
+        activeIndex={lightboxIndex}
+        onClose={() => setLightboxIndex(null)}
+        onChangeIndex={setLightboxIndex}
+      />
+    </div>
+  );
+}
+
+
+
+================================================================
+FILE: D:\OLER\COOLYEAH DEK\Portofolio\oler\aurell-portfolio\src\components\layout\Footer.tsx
+================================================================
+import React from "react";
+import Link from "next/link";
+import { profileData } from "@/data/profile";
+import { socialLinks } from "@/data/social-links";
+import { ArrowUpRight } from "lucide-react";
+
+export function Footer() {
+  const currentYear = new Date().getFullYear();
+
+  return (
+    <footer className="border-t border-zinc-800/80 bg-[#0a0a0c] mt-24">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+        <div className="space-y-1">
+          <p className="text-sm font-medium text-zinc-200">
+            {profileData.fullName}
+          </p>
+          <p className="text-xs text-zinc-500">
+            {profileData.academicIdentity} · {profileData.location}
+          </p>
+          <p className="text-xs font-mono text-zinc-600 pt-2">
+            © {currentYear} {profileData.fullName}. All rights reserved.
+          </p>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-4">
+          <Link
+            href="/education"
+            className="text-xs font-mono text-zinc-400 hover:text-lime-400 transition-colors"
+          >
+            Education & Credentials
+          </Link>
+          {socialLinks.map((item) => (
+            <a
+              key={item.platform}
+              href={item.url}
+              target={item.url.startsWith("mailto:") ? undefined : "_blank"}
+              rel={
+                item.url.startsWith("mailto:")
+                  ? undefined
+                  : "noopener noreferrer"
+              }
+              className="inline-flex items-center gap-1 text-xs font-mono text-zinc-300 hover:text-lime-400 transition-colors"
+            >
+              <span>{item.label}</span>
+              <ArrowUpRight className="w-3.5 h-3.5" />
+            </a>
+          ))}
+        </div>
+      </div>
+    </footer>
+  );
+}
+
+
+
+================================================================
+FILE: D:\OLER\COOLYEAH DEK\Portofolio\oler\aurell-portfolio\src\components\layout\Navbar.tsx
+================================================================
+"use client";
+
+import React, { useState } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { Menu, X } from "lucide-react";
+import { profileData } from "@/data/profile";
+
+const navItems = [
+  { label: "Home", href: "/" },
+  { label: "About", href: "/about" },
+  { label: "Projects", href: "/projects" },
+  { label: "Experience", href: "/experience" },
+  { label: "Creative Works", href: "/creative-works" },
+  { label: "Contact", href: "/contact" },
+];
+
+export function Navbar() {
+  const pathname = usePathname();
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  const isActive = (href: string) => {
+    if (href === "/") return pathname === "/";
+    return pathname.startsWith(href);
+  };
+
+  return (
+    <header className="sticky top-0 z-40 backdrop-blur-md bg-[#0a0a0c]/85 border-b border-zinc-800/80">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+        <Link
+          href="/"
+          className="flex items-center gap-3 group focus:outline-none"
+        >
+          <span className="w-8 h-8 rounded-md bg-zinc-900 border border-zinc-700/80 flex items-center justify-center text-xs font-mono font-semibold text-lime-400 group-hover:border-lime-400/60 transition-colors">
+            {profileData.monogram}
+          </span>
+          <div className="flex flex-col">
+            <span className="text-sm font-medium text-zinc-100 tracking-tight">
+              Aurell Satrianitto
+            </span>
+            <span className="text-[11px] font-mono text-zinc-500 hidden sm:inline">
+              Software & Backend Engineering
+            </span>
+          </div>
+        </Link>
+
+        {/* Desktop Nav */}
+        <nav aria-label="Main Navigation" className="hidden md:flex items-center gap-1">
+          {navItems.map((item) => {
+            const active = isActive(item.href);
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`px-3.5 py-2 rounded-md text-sm transition-colors ${
+                  active
+                    ? "text-lime-400 bg-zinc-900/90 font-medium"
+                    : "text-zinc-400 hover:text-zinc-100 hover:bg-zinc-900/40"
+                }`}
+              >
+                {item.label}
+              </Link>
+            );
+          })}
+        </nav>
+
+        {/* Mobile menu button */}
+        <button
+          type="button"
+          onClick={() => setMobileOpen((prev) => !prev)}
+          aria-expanded={mobileOpen}
+          aria-label="Toggle Menu"
+          className="md:hidden p-2 rounded-md text-zinc-400 hover:text-zinc-100 hover:bg-zinc-900 border border-transparent hover:border-zinc-800"
+        >
+          {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+        </button>
+      </div>
+
+      {/* Mobile Dropdown */}
+      {mobileOpen && (
+        <nav
+          aria-label="Mobile Navigation"
+          className="md:hidden border-b border-zinc-800 bg-[#0e0e12] px-4 pt-2 pb-4 space-y-1"
+        >
+          {navItems.map((item) => {
+            const active = isActive(item.href);
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={() => setMobileOpen(false)}
+                className={`block px-3 py-2.5 rounded-md text-sm ${
+                  active
+                    ? "text-lime-400 bg-zinc-900 font-medium"
+                    : "text-zinc-300 hover:bg-zinc-900/60"
+                }`}
+              >
+                {item.label}
+              </Link>
+            );
+          })}
+        </nav>
+      )}
+    </header>
+  );
+}
+
+
+
+================================================================
+FILE: D:\OLER\COOLYEAH DEK\Portofolio\oler\aurell-portfolio\src\components\ui\Badge.tsx
+================================================================
+import React from "react";
+
+interface BadgeProps {
+  children: React.ReactNode;
+  variant?: "default" | "accent" | "outline";
+}
+
+export function Badge({ children, variant = "default" }: BadgeProps) {
+  const styles = {
+    default: "bg-zinc-900 text-zinc-300 border border-zinc-800",
+    accent: "bg-lime-400/10 text-lime-300 border border-lime-400/30",
+    outline: "bg-transparent text-zinc-400 border border-zinc-800",
+  };
+
+  return (
+    <span
+      className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-mono ${styles[variant]}`}
+    >
+      {children}
+    </span>
+  );
+}
+
+
+
+================================================================
+FILE: D:\OLER\COOLYEAH DEK\Portofolio\oler\aurell-portfolio\src\components\ui\EmptyState.tsx
+================================================================
+import React from "react";
+import { Layers } from "lucide-react";
+
+interface EmptyStateProps {
+  title: string;
+  description: string;
+  hintCommand?: string;
+}
+
+export function EmptyState({ title, description, hintCommand }: EmptyStateProps) {
+  return (
+    <div className="rounded-xl border border-zinc-800/80 bg-zinc-900/30 p-8 sm:p-10 flex flex-col items-start justify-between gap-4">
+      <div className="w-10 h-10 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-400">
+        <Layers className="w-5 h-5" />
+      </div>
+      <div className="space-y-1.5 max-w-xl">
+        <h3 className="text-base font-medium text-zinc-200">{title}</h3>
+        <p className="text-sm text-zinc-400 leading-relaxed">{description}</p>
+      </div>
+      {hintCommand && (
+        <div className="text-xs font-mono text-zinc-500 bg-zinc-950/90 border border-zinc-800/80 px-3 py-2 rounded-md">
+          Workflow: <span className="text-zinc-300">{hintCommand}</span>
+        </div>
+      )}
+    </div>
+  );
+}
+
+
+
+================================================================
+FILE: D:\OLER\COOLYEAH DEK\Portofolio\oler\aurell-portfolio\src\components\ui\ResponsiveImage.tsx
+================================================================
+import React from "react";
+import manifestData from "@/generated/image-manifest.json";
+import { ManifestEntry } from "@/types/portfolio";
+import { ImageOff } from "lucide-react";
+
+const manifest = manifestData as Record<string, ManifestEntry>;
+
+interface ResponsiveImageProps {
+  imageKey?: string | null;
+  alt: string;
+  sizes?: string;
+  className?: string;
+  imgClassName?: string;
+  priority?: boolean;
+  objectFit?: "cover" | "contain";
+}
+
+export function ResponsiveImage({
+  imageKey,
+  alt,
+  sizes = "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw",
+  className = "",
+  imgClassName = "",
+  priority = false,
+  objectFit = "cover",
+}: ResponsiveImageProps) {
+  if (!imageKey) {
+    return (
+      <div
+        className={`flex flex-col items-center justify-center bg-zinc-900/70 border border-zinc-800/80 text-zinc-500 p-6 text-center ${className}`}
+      >
+        <ImageOff className="w-6 h-6 mb-2 text-zinc-600" />
+        <span className="text-xs font-mono uppercase tracking-wider text-zinc-500">
+          Visual Asset Pending
+        </span>
+      </div>
+    );
+  }
+
+  const entry = manifest[imageKey];
+
+  if (!entry) {
+    if (process.env.NODE_ENV === "development") {
+      console.warn(
+        `[ResponsiveImage] Image key "${imageKey}" tidak ditemukan di src/generated/image-manifest.json. Pastikan gambar sudah ada di source-images/ dan jalankan "npm run images:optimize".`
+      );
+    }
+
+    return (
+      <div
+        className={`flex flex-col items-center justify-center bg-zinc-900/70 border border-dashed border-zinc-800 text-zinc-400 p-6 text-center ${className}`}
+      >
+        <span className="text-xs font-mono text-amber-400/90 mb-1">
+          Unoptimized / Missing Key
+        </span>
+        <code className="text-[11px] text-zinc-500 break-all">{imageKey}</code>
+      </div>
+    );
+  }
+
+  const avifSrcSet = entry.avif.map((v) => `${v.path} ${v.width}w`).join(", ");
+  const webpSrcSet = entry.webp.map((v) => `${v.path} ${v.width}w`).join(", ");
+
+  return (
+    <picture className={`block overflow-hidden ${className}`}>
+      {avifSrcSet && (
+        <source type="image/avif" srcSet={avifSrcSet} sizes={sizes} />
+      )}
+      {webpSrcSet && (
+        <source type="image/webp" srcSet={webpSrcSet} sizes={sizes} />
+      )}
+      <img
+        src={entry.fallbackSrc}
+        alt={alt}
+        width={entry.outputWidth}
+        height={entry.outputHeight}
+        loading={priority ? "eager" : "lazy"}
+        decoding={priority ? "sync" : "async"}
+        fetchPriority={priority ? "high" : "auto"}
+        className={`w-full h-full transition-transform duration-500 ${
+          objectFit === "contain" ? "object-contain" : "object-cover"
+        } ${imgClassName}`}
+      />
+    </picture>
+  );
+}
+
+
+
+================================================================
+FILE: D:\OLER\COOLYEAH DEK\Portofolio\oler\aurell-portfolio\src\components\ui\SectionHeader.tsx
+================================================================
+import React from "react";
+import Link from "next/link";
+import { ArrowUpRight } from "lucide-react";
+
+interface SectionHeaderProps {
+  eyebrow: string;
+  title: string;
+  description?: string;
+  actionHref?: string;
+  actionLabel?: string;
+}
+
+export function SectionHeader({
+  eyebrow,
+  title,
+  description,
+  actionHref,
+  actionLabel,
+}: SectionHeaderProps) {
+  return (
+    <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-8 border-b border-zinc-800/80">
+      <div className="space-y-2 max-w-2xl">
+        <p className="text-xs font-mono uppercase tracking-[0.2em] text-lime-400">
+          {eyebrow}
+        </p>
+        <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-zinc-100">
+          {title}
+        </h2>
+        {description && (
+          <p className="text-sm sm:text-base text-zinc-400 leading-relaxed pt-1">
+            {description}
+          </p>
+        )}
+      </div>
+
+      {actionHref && actionLabel && (
+        <Link
+          href={actionHref}
+          className="inline-flex items-center gap-1.5 text-sm font-medium text-zinc-300 hover:text-lime-400 transition-colors group shrink-0"
+        >
+          <span>{actionLabel}</span>
+          <ArrowUpRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+        </Link>
+      )}
+    </div>
+  );
+}
+
+
+
+================================================================
+FILE: D:\OLER\COOLYEAH DEK\Portofolio\oler\aurell-portfolio\src\data\education.ts
+================================================================
+import {
+  EducationItem,
+  CertificationItem,
+  LanguageTestItem,
+} from "@/types/portfolio";
+
+export const educationList: EducationItem[] = [
+  {
+    degree: "D-IV Teknologi Rekayasa Perangkat Lunak",
+    institution: "Universitas Gadjah Mada",
+    period: "2025–Present",
+    description:
+      "Fokus studi pada rekayasa perangkat lunak terapan, pengembangan sistem informasi, perancangan basis data, dan manajemen proyek perangkat lunak.",
+  },
+];
+
+export const certificationsList: CertificationItem[] = [
+  {
+    title: "Data Center Technical Support Junior",
+    issuer: "Badan Nasional Sertifikasi Profesi (BNSP)",
+    year: "2025",
+  },
+];
+
+export const languageTestsList: LanguageTestItem[] = [
+  {
+    testName: "ETS TOEIC",
+    organizer: "Educational Testing Service (ETS)",
+    score: "825 / 990",
+    year: "2023",
+  },
+];
+
+
+
+================================================================
+FILE: D:\OLER\COOLYEAH DEK\Portofolio\oler\aurell-portfolio\src\data\experiences.ts
+================================================================
+
+import { ExperienceItem } from "@/types/portfolio";
+
+export const experiencesData: ExperienceItem[] = [
+  {
+    slug: "mapagama-operasional",
+    organization: "MAPAGAMA — Universitas Gadjah Mada",
+    position: "Staff Operasional",
+    category: "organizational",
+    period: "2026/2027",
+    isCurrent: true,
+    description:
+      "Bertanggung jawab atas tata kelola sistem sirkulasi peralatan operasional, kontrol kualitas inventaris, pemeliharaan preventif, serta optimalisasi gudang dan mobilisasi perlengkapan kegiatan Mahasiswa Pecinta Alam Universitas Gadjah Mada.",
+    responsibilities: [
+      "Mengelola sistem pencatatan sirkulasi peralatan operasional.",
+      "Mengawasi kebutuhan inventaris kegiatan.",
+      "Melakukan kontrol kualitas dan pemeliharaan preventif.",
+      "Memverifikasi kelayakan peralatan.",
+      "Mengoptimalkan penataan gudang dan mobilisasi perlengkapan.",
+    ],
+    featured: true,
+    images: [],
+  },
+  {
+    slug: "gdl-technical-member",
+    organization:
+      "Google Developer Groups on Campus (GDGoC) Universitas Gadjah Mada",
+    position: "Technical Member (Hacker)",
+    category: "organizational",
+    period: "December 2025–July 2026",
+    startDate: "December 2025",
+    endDate: "July 2026",
+    isCurrent: false,
+    description:
+      "Berpartisipasi aktif sebagai Technical Member (Hacker) dalam eksplorasi rekayasa backend, perancangan sistem, integrasi Google Gemini AI, serta pembuatan prototipe produk digital bersama anggota lintas disiplin.",
+    responsibilities: [
+      "Eksplorasi pengembangan backend.",
+      "Eksplorasi perancangan sistem.",
+      "Eksplorasi integrasi teknologi Google Gemini AI.",
+      "Kolaborasi dalam tim lintas disiplin.",
+      "Partisipasi dalam workshop teknologi.",
+      "Partisipasi dalam diskusi kelompok.",
+      "Pengembangan prototipe produk digital.",
+      "Berbagi pengetahuan dengan sesama anggota.",
+    ],
+    featured: true,
+    images: [],
+  },
+  {
+    slug: "gladimula-xliii",
+    organization: "MAPAGAMA — Universitas Gadjah Mada",
+    programName: "GLADIMULA XLIII",
+    position: "Staf Media & Informasi",
+    category: "committee",
+    period: "September 2026–Present",
+    startDate: "September 2026",
+    isCurrent: true,
+    description:
+      "Mengelola produksi konten publikasi media sosial, dokumentasi visual kegiatan lapangan, serta distribusi informasi internal dan eksternal kepanitiaan GLADIMULA XLIII dengan menjaga konsistensi identitas visual.",
+    responsibilities: [
+      "Produksi dan pengelolaan konten publikasi feed media sosial.",
+      "Dokumentasi visual kegiatan lapangan.",
+      "Distribusi informasi kegiatan.",
+      "Komunikasi informasi internal dan eksternal kepanitiaan.",
+      "Menjaga konsistensi identitas visual.",
+      "Menjaga ketepatan waktu publikasi.",
+    ],
+    featured: true,
+    images: [],
+  },
+  {
+    slug: "gladimadya-2026",
+    organization: "MAPAGAMA — Universitas Gadjah Mada",
+    programName: "GLADIMADYA Panjat Tebing 2026",
+    position: "Koordinator Tim",
+    additionalPositions: ["Sie Komunikasi", "Sie Dokumentasi"],
+    category: "committee",
+    period: "March–November 2026",
+    startDate: "March 2026",
+    endDate: "November 2026",
+    isCurrent: false,
+    description:
+      "Menjalankan peran terpadu dalam koordinasi tim pelaksana, pengelolaan alur komunikasi kegiatan, serta koordinasi dokumentasi pada rangkaian kegiatan GLADIMADYA Panjat Tebing 2026.",
+    responsibilities: [
+      "Mengkoordinasikan tim pelaksana.",
+      "Mengatur pembagian dan pelaksanaan tugas tim.",
+      "Mengelola alur komunikasi kegiatan.",
+      "Mengkoordinasikan dokumentasi kegiatan.",
+    ],
+    featured: true,
+    images: [],
+  },
+  {
+    slug: "tmc-logistics",
+    organization:
+      "Technical Mountaineering Club (TMC) — SMK Negeri 2 Yogyakarta",
+    position: "Kepala Inventaris Logistik",
+    category: "organizational",
+    period: "August 2022–August 2023",
+    startDate: "August 2022",
+    endDate: "August 2023",
+    isCurrent: false,
+    description:
+      "Memimpin pengelolaan aset dan perlengkapan operasional organisasi, menetapkan prosedur penyimpanan, serta menyusun pelaporan inventaris secara berkala.",
+    responsibilities: [
+      "Memimpin pengelolaan inventaris.",
+      "Mencatat sirkulasi keluar-masuk barang.",
+      "Mengawasi kondisi dan ketersediaan perlengkapan operasional.",
+      "Menetapkan prosedur penyimpanan peralatan.",
+      "Mengkoordinasikan verifikasi inventaris.",
+      "Menyusun laporan aset organisasi.",
+    ],
+    featured: false,
+    images: [],
+  },
+  {
+    slug: "porsenigama-2026",
+    organization: "MAPAGAMA — Universitas Gadjah Mada",
+    programName: "PORSENIGAMA Panjat Tebing 2026",
+    position: "Panitia Cabang",
+    category: "committee",
+    period: "October 2026",
+    startDate: "October 2026",
+    endDate: "October 2026",
+    isCurrent: false,
+    description:
+      "Terlibat sebagai panitia dokumentasi cabang olahraga Panjat Tebing dalam rangkaian Pekan Olahraga dan Seni Universitas Gadjah Mada (PORSENIGAMA) 2026.",
+    responsibilities: [
+      "Melakukan dokumentasi visual selama rangkaian kegiatan pertandingan Panjat Tebing.",
+      "Mengabadikan momen dan aktivitas selama pelaksanaan kegiatan.",
+      "Mendukung kebutuhan dokumentasi kegiatan cabang olahraga.",
+    ],
+    featured: false,
+    images: [],
+  },
+];
+
+
+
+
+================================================================
+FILE: D:\OLER\COOLYEAH DEK\Portofolio\oler\aurell-portfolio\src\data\photography.ts
+================================================================
+import { PhotographyAlbum } from "@/types/portfolio";
+
+/**
+ * Daftar koleksi album fotografi.
+ * Array `images` dikosongkan secara jujur hingga foto asli dimasukkan ke `source-images/photography/`
+ * dan dioptimasi menggunakan `npm run images:optimize`.
+ */
+export const photographyAlbums: PhotographyAlbum[] = [
+  {
+    slug: "mountain-activities",
+    title: "Mountain & Vertical Activities",
+    category: "Mountain Activities",
+    description:
+      "Dokumentasi kegiatan lapangan, operasional gunung hutan, dan aktivitas pemanjatan tebing.",
+    coverImageKey: "photography/scenery",
+    images: [
+        {
+            imageKey: "photography/greenery",
+            alt: "Pemandangan alam hijau",
+            caption: "Pemandangan alam hijau nan kabut di perbukitan Purworejo.",
+            date: "2026-10-23",
+            location: "Purworejo, Indonesia",
+        },
+        {
+            imageKey: "photography/spider-web",
+            alt: "spider web",
+            caption: "Jaring laba-laba di gubuk.",
+            date: "2026-10-24",
+            location: "Purworejo, Indonesia",
+        },
+        {
+            imageKey: "photography/scenery",
+            alt: "Pemandangan alam",
+            caption: "Pemandangan Waduk Sermo dari Purworejo.",
+            date: "2026-10-25",
+            location: "Kulon Progo, Indonesia",
+        }
+    ],
+    featured: true,
+    tags: ["Mountaineering", "Rock Climbing", "Field Operations"],
+  },
+  {
+    slug: "outdoor-and-nature",
+    title: "Outdoor & Natural Landscapes",
+    category: "Outdoor & Nature",
+    description:
+      "Eksplorasi visual lanskap alam terbuka, suasana hutan, dan kondisi lingkungan selama perjalanan lapangan.",
+    coverImageKey: null,
+    images: [
+        {
+            imageKey: "experiences/impk",
+            alt: "Kegiatan IMPK",
+            caption: "Kegiatan Ilmu Medan, Peta, dan Kompas.",
+            date: "2026-10-25",
+            location: "Gunung Sigepak, Purworejo",
+        }
+    ],
+    featured: true,
+    tags: ["Nature", "Landscape", "Outdoor"],
+  },
+  {
+    slug: "organizational-documentation",
+    title: "Organizational & Event Documentation",
+    category: "Organizational Activities",
+    description:
+      "Rekaman visual kegiatan organisasi, latihan rutin, dan program kerja kolektif di lingkungan kampus.",
+    coverImageKey: "experiences/long-march",
+    images: [
+        {
+            imageKey: "experiences/rescue-korban",
+            alt: "Kegiatan Rescue",
+            caption: "Kegiatan rescue korban di perbukitan Menoreh.",
+            date: "2026-10-25",
+            location: "Gunung Sigepak",
+        },
+        {
+            imageKey: "experiences/rescue",
+            alt: "Kegiatan Rescue",
+            caption: "Penyelamatan korban di mulut goa.",
+            date: "2026-10-25",
+            location: "Watu Pecah, Purworejo",
+        },
+        {
+            imageKey: "experiences/long-march",
+            alt: "Kegiatan Long March",
+            caption: "Kegiatan long march di perbukitan Menoreh.",
+            date: "2026-10-25",
+            location: "Gunung Sigepak",
+        }
+    ],
+    featured: true,
+    tags: ["MAPAGAMA", "Event", "Documentation"],
+  },
+];
+
+
+
+================================================================
+FILE: D:\OLER\COOLYEAH DEK\Portofolio\oler\aurell-portfolio\src\data\profile.ts
+================================================================
+
+import { ProfileData } from "@/types/portfolio";
+
+export const profileData: ProfileData = {
+  fullName: "Aurell Satrianitto Prianggono",
+  monogram: "ASP",
+  professionalIdentity: "Backend Developer & Software Engineering Student",
+  academicIdentity:
+    "D-IV Teknologi Rekayasa Perangkat Lunak — Universitas Gadjah Mada",
+  institution: "Universitas Gadjah Mada",
+  location: "Yogyakarta, Indonesia",
+  enrollmentYear: 2025,
+  focus: "Backend Engineering and System Development",
+
+  heroHeadline:
+    "Developing reliable backend systems and structured software solutions.",
+  heroSubheadline:
+    "Mahasiswa D-IV Teknologi Rekayasa Perangkat Lunak di Universitas Gadjah Mada dengan minat pada backend engineering, perancangan basis data, dan pengembangan sistem.",
+  shortIntroduction:
+    "Berbasis di Yogyakarta, saya mengembangkan solusi perangkat lunak melalui pembangunan RESTful API, perancangan basis data, dan kolaborasi dalam proyek teknologi.",
+
+  profileImageKey: "profile/profile",
+  cvUrl: "/cv-aurell-satrianitto.pdf",
+
+  aboutSections: {
+    personalIntroduction: [
+      "Saya Aurell Satrianitto Prianggono, mahasiswa Teknologi Rekayasa Perangkat Lunak yang memiliki ketertarikan pada pengembangan sistem dan rekayasa perangkat lunak.",
+      "Ketertarikan saya berawal dari rasa ingin tahu tentang bagaimana sebuah sistem bekerja di balik layar, mulai dari pengelolaan data, komunikasi antarlayanan melalui API, hingga integrasi berbagai komponen menjadi sebuah aplikasi yang utuh.",
+    ],
+
+    educationalBackground: [
+      "Saat ini saya menempuh pendidikan D-IV Teknologi Rekayasa Perangkat Lunak di Universitas Gadjah Mada sejak tahun 2025.",
+      "Melalui perkuliahan dan proyek kolaboratif, saya mempelajari berbagai tahapan pengembangan perangkat lunak, mulai dari analisis kebutuhan, perancangan sistem dan basis data, implementasi, hingga pengujian dan pengelolaan proyek.",
+    ],
+
+    technicalInterests: [
+      "Fokus teknis utama saya adalah Backend Engineering dan System Development. Saya memiliki pengalaman mengembangkan aplikasi dan RESTful API menggunakan Laravel, Golang dengan Fiber, serta Python melalui FastAPI dan Flask.",
+      "Saya juga memiliki ketertarikan pada perancangan basis data relasional menggunakan MySQL dan PostgreSQL, penyusunan Entity-Relationship Diagram (ERD), penerapan clean architecture, serta integrasi teknologi AI ke dalam aplikasi.",
+    ],
+
+    professionalInterests: [
+      "Selain pengembangan perangkat lunak, saya tertarik pada Technical Project Management dan koordinasi tim lintas fungsi.",
+      "Keterlibatan dalam proyek kolaboratif dan kepanitiaan memberi saya pengalaman dalam perencanaan sprint, pembagian tugas, koordinasi pelaksanaan, serta pengelolaan kebutuhan operasional tim.",
+    ],
+
+    workingApproach: [
+      "Dalam mengembangkan perangkat lunak, saya mengutamakan struktur kode yang jelas, pemisahan tanggung jawab antarbagian sistem, dan dokumentasi yang dapat dipahami oleh anggota tim.",
+      "Pengalaman dalam komunitas teknologi dan organisasi mahasiswa juga membentuk pendekatan kerja yang disiplin, adaptif, komunikatif, dan berorientasi pada kolaborasi.",
+    ],
+
+    careerDirection: [
+      "Saya ingin terus mengembangkan kemampuan di bidang Backend Engineering dan System Architecture, sekaligus memperluas pengalaman dalam pengelolaan proyek teknologi. Saya terbuka terhadap kesempatan magang, kolaborasi proyek, dan kontribusi dalam komunitas teknologi.",
+    ],
+  },
+};
+
+
+
+
+================================================================
+FILE: D:\OLER\COOLYEAH DEK\Portofolio\oler\aurell-portfolio\src\data\projects.ts
+================================================================
+import { ProjectItem } from "@/types/portfolio";
+
+export const projectsData: ProjectItem[] = [
+  {
+    slug: "bioloop-ax",
+    title: "BioLoop AX",
+    category: "Backend & Web System",
+    typeLabel: "Web Application Platform",
+    role: "Backend Developer (BE1) & Project Manager",
+    period: "Oktober 2026",
+    description:
+      "Pengembangan platform pengelolaan minyak jelantah berbasis web dengan integrasi backend, basis data, dan AI untuk menganalisis foto serta memperkirakan volume minyak jelantah.",
+    overview:
+      "BioLoop AX merupakan platform digital yang dikembangkan untuk mendukung pengelolaan minyak jelantah dari sisi usaha kuliner. Aplikasi ini mengintegrasikan layanan backend, antarmuka web, basis data, dan teknologi AI. Saya berperan sebagai Backend Developer (BE1) sekaligus Project Manager, dengan tanggung jawab pada pengembangan layanan backend, integrasi sistem, serta koordinasi pelaksanaan proyek.",
+    responsibilities: [
+      "Pengembangan layanan backend menggunakan Python dan FastAPI.",
+      "Perancangan dan implementasi endpoint RESTful API untuk kebutuhan aplikasi.",
+      "Pengembangan fitur analisis foto minyak jelantah menggunakan Gemini Vision untuk memperkirakan volume berdasarkan gambar yang diunggah.",
+      "Integrasi backend dengan Supabase PostgreSQL untuk pengelolaan data aplikasi.",
+      "Integrasi Supabase Storage untuk penyimpanan berkas yang diunggah pengguna.",
+      "Kolaborasi teknis dengan tim frontend dalam proses integrasi backend dan frontend.",
+      "Penyusunan sprint planning serta pembagian dan pemantauan tugas tim.",
+      "Koordinasi antaranggota tim untuk memastikan proses pengembangan berjalan sesuai rencana.",
+    ],
+    technologies: {
+      personalContribution: [
+        "Python",
+        "FastAPI",
+        "RESTful API",
+        "Supabase",
+        "PostgreSQL",
+        "Gemini Vision",
+        "Database Design",
+      ],
+      teamOrContext: [
+        "React",
+        "Next.js",
+      ],
+    },
+    developmentProcess: [
+      "Pengelolaan sprint planning dan koordinasi pekerjaan lintas tim.",
+      "Pengembangan backend dan integrasi layanan pendukung aplikasi.",
+      "Integrasi backend dengan frontend hingga aplikasi dapat digunakan secara terpadu.",
+    ],
+    status: "Completed & Deployed",
+    resultOrStatus:
+      "Frontend dan backend telah dikembangkan, diintegrasikan, dan dideploy secara terpisah. Fitur analisis foto menggunakan Gemini Vision menghasilkan estimasi volume minyak jelantah berdasarkan gambar yang diunggah.",
+    thumbnail: "projects/bioloop-ax/thumbnail",
+    gallery: [],
+    featured: true,
+    githubUrl: "https://github.com/MilkyTaaaaa/BioLoop-AX.git",
+    liveUrl: null,
+    isTeamCollaboration: true,
+    collaborationNote:
+      "Pengembangan dilakukan secara kolaboratif. Kontribusi saya berfokus pada backend menggunakan Python dan FastAPI serta koordinasi proyek. React dan Next.js merupakan teknologi frontend yang dikembangkan oleh anggota tim lainnya.",
+  },
+  {
+    slug: "simonika",
+    title: "SIMONIKA",
+    category: "Backend & Web System",
+    typeLabel: "Web Application System",
+    role: "Backend & System Developer",
+    period: "September - November 2026",
+    description:
+      "Pengembangan sistem monitoring kinerja aparatur kalurahan menggunakan Laravel dan MySQL, mencakup autentikasi, manajemen data, presensi, serta monitoring kinerja pegawai.",
+    overview:
+      "SIMONIKA merupakan sistem informasi berbasis web untuk mendukung pengelolaan dan monitoring kinerja aparatur kalurahan. Sistem dikembangkan secara kolaboratif dengan pembagian pekerjaan backend dan frontend. Saya bertanggung jawab pada pengembangan backend menggunakan Laravel, perancangan basis data MySQL, serta pemodelan sistem melalui ERD dan DFD.",
+    responsibilities: [
+      "Pengembangan backend aplikasi menggunakan Laravel 13.x dan PHP.",
+      "Perancangan Entity Relationship Diagram (ERD) dan Data Flow Diagram (DFD) sebagai dasar pemodelan sistem.",
+      "Perancangan dan pengelolaan struktur basis data menggunakan MySQL.",
+      "Implementasi sistem autentikasi dengan dukungan login multi-peran dan pengelolaan sesi akun.",
+      "Pengembangan modul manajemen pengguna, nomenklatur jabatan, serta konfigurasi struktur organisasi dan beban kinerja.",
+      "Implementasi fitur presensi berbasis geotag dan selfie dengan validasi radius GPS.",
+      "Pengembangan modul pencatatan rencana kerja, laporan kinerja, dan pengunggahan bukti kegiatan.",
+      "Implementasi fitur monitoring antar-pamong dan dashboard rekapitulasi presensi serta capaian kinerja.",
+      "Koordinasi integrasi backend dengan frontend yang dikembangkan oleh anggota tim.",
+    ],
+    technologies: {
+      personalContribution: [
+        "Laravel 13.x",
+        "PHP",
+        "MySQL",
+        "Database Design",
+        "Entity Relationship Diagram (ERD)",
+        "Data Flow Diagram (DFD)",
+        "Backend Development",
+      ],
+      teamOrContext: ["React"],
+    },
+    status: "In Development",
+    thumbnail: "projects/simonika/thumbnail",
+    gallery: [],
+    featured: true,
+    githubUrl: "https://github.com/MilkyTaaaaa/SIMONIKA.git",
+    liveUrl: null,
+    isTeamCollaboration: true,
+    collaborationNote:
+      "Pengembangan dilakukan secara kolaboratif. Kontribusi saya berfokus pada backend, perancangan basis data, ERD, dan DFD menggunakan Laravel serta MySQL. Pengembangan frontend menggunakan React dikerjakan oleh anggota tim lainnya.",
+  },
+  {
+    slug: "gi-presensi",
+    title: "GI-Presensi",
+    category: "Backend Development & API",
+    typeLabel: "Attendance REST API",
+    role: "Backend Developer / API Designer",
+    period: "September–November 2024",
+    description:
+      "Pengembangan backend REST API untuk sistem presensi sekolah menggunakan Golang, Fiber, dan PostgreSQL dengan penerapan struktur Clean Architecture.",
+    overview:
+      "GI-Presensi merupakan proyek pengembangan sistem presensi sekolah yang dikerjakan dalam rangka Praktik Kerja Lapangan (PKL) saat SMK. Proyek ini awalnya dikembangkan secara tim, tetapi hasil akhir yang saya kerjakan berfokus pada sisi backend berupa RESTful API menggunakan Golang dan Fiber. Pengembangan mencakup pengelolaan routing, middleware, controller, integrasi basis data, serta penerapan struktur Clean Architecture.",
+    responsibilities: [
+      "Pengembangan backend RESTful API menggunakan Golang dan Fiber.",
+      "Perancangan dan pengelolaan routing untuk kebutuhan endpoint API.",
+      "Implementasi middleware untuk mendukung alur pemrosesan request.",
+      "Pengembangan controller untuk menangani logika pemrosesan API.",
+      "Integrasi backend dengan basis data PostgreSQL.",
+      "Penerapan struktur Clean Architecture untuk menjaga pemisahan tanggung jawab antarbagian sistem.",
+    ],
+    technologies: {
+      personalContribution: [
+        "Golang",
+        "Fiber",
+        "PostgreSQL",
+        "RESTful API",
+        "Clean Architecture",
+      ],
+      teamOrContext: [],
+    },
+    status: "Completed",
+    thumbnail: "projects/gi-presensi/thumbnail",
+    gallery: [],
+    featured: false,
+    githubUrl: "https://github.com/MilkyTaaaaa/GI-presensi.git",
+    liveUrl: null,
+    isTeamCollaboration: true,
+    collaborationNote:
+      "Proyek bermula dari pengerjaan tim selama Praktik Kerja Lapangan (PKL). Hasil akhir yang saya kerjakan berfokus pada pengembangan backend REST API, tanpa mencakup pengembangan frontend.",
+  },
+  {
+    slug: "panenin",
+    title: "PanenIn",
+    category: "Backend & AI Development",
+    typeLabel: "AI-Based Mobile-First Web Application",
+    role: "Backend Developer",
+    period: "April–Mei 2026",
+    description:
+      "Pengembangan backend aplikasi pertanian berbasis AI menggunakan Next.js dan TypeScript, dengan integrasi Gemini AI, OpenWeatherMap, Supabase, serta Firebase Cloud Messaging.",
+    overview:
+      "PanenIn merupakan aplikasi berbasis web dengan pendekatan mobile-first yang dikembangkan untuk membantu petani memperoleh informasi dan panduan terkait aktivitas pertanian. Aplikasi ini menyediakan fitur konsultasi AI, informasi cuaca dan rekomendasi pertanian, kalkulator usaha tani, panduan tanam, serta pencatatan hasil panen. Saya bertanggung jawab pada pengembangan backend, integrasi layanan eksternal, pengelolaan data, dan implementasi API selama Sprint 1 hingga Sprint 4.",
+    responsibilities: [
+      "Menyiapkan fondasi backend dan struktur proyek menggunakan Next.js App Router dan TypeScript.",
+      "Mengembangkan endpoint REST API untuk mendukung kebutuhan fitur aplikasi.",
+      "Mengintegrasikan Google Gemini API untuk fitur konsultasi pertanian berbasis AI.",
+      "Mengembangkan layanan rekomendasi pertanian berdasarkan informasi cuaca menggunakan Gemini AI.",
+      "Mengintegrasikan OpenWeatherMap API untuk memperoleh data cuaca dan informasi lokasi.",
+      "Mengintegrasikan Supabase untuk autentikasi, pengelolaan data, dan penyimpanan informasi aplikasi.",
+      "Mengembangkan API untuk fitur kalkulator usaha tani dan pencatatan hasil panen.",
+      "Mengimplementasikan Firebase Admin SDK dan Firebase Cloud Messaging untuk pengiriman push notification.",
+      "Mengembangkan mekanisme pengelolaan preferensi notifikasi dan penjadwalan pengiriman notifikasi.",
+      "Mengintegrasikan antarmodul backend dengan frontend serta melakukan perbaikan bug selama pengembangan.",
+    ],
+    technologies: {
+      personalContribution: [
+        "TypeScript",
+        "Next.js App Router",
+        "RESTful API",
+        "Supabase",
+        "Google Gemini API",
+        "OpenWeatherMap API",
+        "Firebase Admin SDK",
+        "Firebase Cloud Messaging",
+      ],
+      teamOrContext: [
+        "React",
+        "Next.js",
+      ],
+    },
+    developmentProcess: [
+      "Sprint 1: Penyiapan fondasi backend, autentikasi, onboarding, dan integrasi awal layanan cuaca.",
+      "Sprint 2: Pengembangan API konsultasi AI, integrasi Gemini, layanan cuaca, dan push notification.",
+      "Sprint 3: Pengembangan dukungan fitur kalkulator usaha tani dan panduan tanam.",
+      "Sprint 4: Pengembangan API catatan panen, integrasi penyimpanan data, dan sinkronisasi antarmodul.",
+      "Final & UAT: Integrasi sistem, perbaikan bug, pengujian pengguna, dan finalisasi MVP.",
+    ],
+    status: "Completed",
+    thumbnail: "projects/panenin/thumbnail",
+    gallery: [],
+    featured: false,
+    githubUrl: "https://github.com/ggalangswt/Panen-In",
+    liveUrl: "https://panen-in-omega.vercel.app",
+    isTeamCollaboration: true,
+    collaborationNote:
+      "Proyek dikembangkan secara kolaboratif dengan pembagian tanggung jawab backend dan frontend. Saya berfokus pada pengembangan backend API, integrasi layanan eksternal, dan pengelolaan data. Frontend dikembangkan oleh anggota tim lainnya.",
+  },
+  {
+    slug: "marbotfx",
+    title: "MarbotFX",
+    category: "System Design & Project Management",
+    typeLabel: "Course Platform Prototype",
+    role: "Project Manager & Database Designer",
+    period: "Januari–Maret 2025",
+    description:
+      "Perancangan prototype platform kursus saham dengan sistem pengelolaan kursus dan subscription pelanggan melalui halaman admin dan subscriber.",
+    overview:
+      "MarbotFX merupakan proyek perancangan platform kursus saham berbasis web yang dirancang untuk menyediakan layanan pembelajaran dengan sistem subscription. Platform ini memiliki dua sisi utama, yaitu halaman admin untuk mengelola kursus dan pelanggan, serta halaman subscriber untuk mengakses layanan pembelajaran. Saya berperan sebagai Project Manager dan Database Designer dengan tanggung jawab pada koordinasi proyek, perencanaan workflow, serta perancangan struktur basis data. Proyek ini diselesaikan hingga tahap prototype dan tidak berlanjut ke tahap implementasi aplikasi.",
+    responsibilities: [
+      "Mengelola koordinasi tim dan alur pengerjaan proyek.",
+      "Menyusun sprint planning dan memantau pelaksanaan tugas.",
+      "Merancang Entity Relationship Diagram (ERD) sebagai dasar struktur basis data.",
+      "Merancang struktur data untuk pengelolaan kursus, pelanggan, dan subscription.",
+      "Menyelaraskan kebutuhan sistem antara sisi admin dan subscriber.",
+      "Mengawasi proses perancangan prototype agar sesuai dengan kebutuhan platform.",
+    ],
+    technologies: {
+      personalContribution: [
+        "Database Design",
+        "Entity Relationship Diagram (ERD)",
+        "Sprint Planning",
+        "Project Management",
+      ],
+      teamOrContext: [],
+    },
+    status: "Prototype Only",
+    thumbnail: "projects/marbotfx/thumbnail",
+    gallery: [],
+    featured: false,
+    githubUrl: null,
+    liveUrl: null,
+    isTeamCollaboration: true,
+    collaborationNote:
+      "Proyek dikerjakan secara kolaboratif dengan pembagian tanggung jawab dalam tim. Kontribusi saya berfokus pada manajemen proyek dan perancangan basis data. Pengembangan aplikasi tidak dilanjutkan setelah tahap prototype.",
+  },
+];
+
+
+
+================================================================
+FILE: D:\OLER\COOLYEAH DEK\Portofolio\oler\aurell-portfolio\src\data\skills.ts
+================================================================
+
+import { SkillGroup } from "@/types/portfolio";
+
+export const personalSkillGroups: SkillGroup[] = [
+  {
+    category: "Backend Development",
+    description:
+      "Pengembangan aplikasi sisi server, implementasi RESTful API, dan integrasi layanan backend.",
+    skills: [
+      "Laravel",
+      "Golang",
+      "Flask",
+      "FastAPI",
+      "RESTful API",
+    ],
+  },
+  {
+    category: "Database Management & Design",
+    description:
+      "Perancangan basis data relasional, pemodelan data, dan pengelolaan basis data.",
+    skills: [
+      "MySQL",
+      "PostgreSQL",
+      "Database Design",
+      "Entity-Relationship Diagram (ERD)",
+      "Data Flow Diagram (DFD)",
+    ],
+  },
+  {
+    category: "Development & Database Tools",
+    description:
+      "Penggunaan perangkat pengembangan, kendali versi, dan administrasi basis data.",
+    skills: [
+      "Git",
+      "GitHub",
+      "DBeaver",
+      "pgAdmin 4",
+      "Postman"
+    ],
+  },
+  {
+    category: "System Design & Project Management",
+    description:
+      "Perancangan sistem, perencanaan pekerjaan, dan koordinasi pengembangan proyek perangkat lunak.",
+    skills: [
+      "System Design",
+      "Project Management",
+      "Sprint Planning",
+    ],
+  },
+  {
+    category: "Other Technical Experience",
+    description:
+      "Pengalaman eksplorasi perangkat keras dan pemrograman mikrokontroler.",
+    skills: ["Arduino"],
+  },
+];
+
+/**
+ * Teknologi yang digunakan dalam proyek kolaboratif atau implementasi
+ * dengan ruang lingkup tertentu. Daftar ini tidak merepresentasikan
+ * seluruhnya sebagai keahlian utama individu.
+ */
+export const projectContextTechnologies: string[] = [
+  "TypeScript",
+  "Next.js App Router",
+  "Supabase",
+  "Firebase Admin SDK",
+  "Firebase Cloud Messaging",
+  "Google Gemini API",
+  "React",
+];
+
+
+
+
+================================================================
+FILE: D:\OLER\COOLYEAH DEK\Portofolio\oler\aurell-portfolio\src\data\social-links.ts
+================================================================
+import { SocialLinkItem } from "@/types/portfolio";
+
+export const socialLinks: SocialLinkItem[] = [
+  {
+    platform: "Email",
+    label: "Email",
+    url: "mailto:orellsatrianitto@gmail.com",
+    usernameOrAddress: "orellsatrianitto@gmail.com",
+  },
+  {
+    platform: "GitHub",
+    label: "GitHub",
+    url: "https://github.com/MilkyTaaaaa",
+    usernameOrAddress: "@MilkyTaaaaa",
+  },
+  {
+    platform: "LinkedIn",
+    label: "LinkedIn",
+    url: "https://www.linkedin.com/in/orell-satrianitto",
+    usernameOrAddress: "orell-satrianitto",
+  },
+
+  {
+    platform: "Instagram",
+    label: "Instagram",
+    url: "https://www.instagram.com/relllsp._/",
+    usernameOrAddress: "@relllsp._",
+  },
+];
+
+
+
+================================================================
+FILE: D:\OLER\COOLYEAH DEK\Portofolio\oler\aurell-portfolio\src\data\social-media.ts
+================================================================
+import { SocialMediaWork } from "@/types/portfolio";
+
+/**
+ * Daftar karya dan pengelolaan konten media sosial.
+ * Array `images` akan otomatis merender carousel dan lightbox begitu imageKey ditambahkan.
+ */
+export const socialMediaWorks: SocialMediaWork[] = [
+  {
+    slug: "gladimula-xliii-feeds",
+    title: "Publikasi Feed & Informasi GLADIMULA XLIII",
+    campaignOrEvent: "GLADIMULA XLIII — MAPAGAMA",
+    description:
+      "Produksi dan pengelolaan rangkaian konten publikasi feed media sosial serta distribusi informasi kegiatan GLADIMULA XLIII.",
+    period: "September 2026–Present",
+    coverImageKey: null,
+    images: [],
+    contentType: "Carousel Feed",
+    roleAndContribution:
+      "Staf Media & Informasi — Bertanggung jawab atas produksi konten feed, dokumentasi visual lapangan, menjaga konsistensi identitas visual, dan ketepatan jadwal publikasi.",
+    ownershipType: "Team Collaboration",
+    featured: true,
+  },
+  {
+    slug: "lapangan-gunung-hutan-mapagama",
+    title: "Dokumentasi & Publikasi Kegiatan Lapangan Gunung Hutan",
+    campaignOrEvent: "Kegiatan Operasional & Lapangan MAPAGAMA",
+    description:
+      "Dokumentasi visual kegiatan lapangan gunung hutan dan penyusunan materi publikasi kegiatan organisasi.",
+    period: "2026",
+    coverImageKey: null,
+    images: [],
+    contentType: "Visual Documentation",
+    roleAndContribution:
+      "Dokumentasi visual lapangan dan kontribusi penyusunan materi informasi publikasi kegiatan.",
+    ownershipType: "Team Collaboration",
+    featured: true,
+  },
+];
+
+
+
+================================================================
+FILE: D:\OLER\COOLYEAH DEK\Portofolio\oler\aurell-portfolio\src\generated\image-manifest.json
+================================================================
+{
+  "experiences/impk": {
+    "key": "experiences/impk",
+    "originalFilename": "impk.jpeg",
+    "category": "experiences",
+    "originalWidth": 7952,
+    "originalHeight": 5304,
+    "outputWidth": 2048,
+    "outputHeight": 1366,
+    "aspectRatio": 1.4992,
+    "originalSizeBytes": 21331968,
+    "avif": [
+      {
+        "width": 480,
+        "height": 320,
+        "path": "/images/optimized/experiences/impk-480w.avif",
+        "sizeBytes": 23190
+      },
+      {
+        "width": 768,
+        "height": 512,
+        "path": "/images/optimized/experiences/impk-768w.avif",
+        "sizeBytes": 40335
+      },
+      {
+        "width": 1200,
+        "height": 800,
+        "path": "/images/optimized/experiences/impk-1200w.avif",
+        "sizeBytes": 68469
+      },
+      {
+        "width": 1600,
+        "height": 1067,
+        "path": "/images/optimized/experiences/impk-1600w.avif",
+        "sizeBytes": 96947
+      },
+      {
+        "width": 2048,
+        "height": 1366,
+        "path": "/images/optimized/experiences/impk-2048w.avif",
+        "sizeBytes": 126821
+      }
+    ],
+    "webp": [
+      {
+        "width": 480,
+        "height": 320,
+        "path": "/images/optimized/experiences/impk-480w.webp",
+        "sizeBytes": 21066
+      },
+      {
+        "width": 768,
+        "height": 512,
+        "path": "/images/optimized/experiences/impk-768w.webp",
+        "sizeBytes": 38940
+      },
+      {
+        "width": 1200,
+        "height": 800,
+        "path": "/images/optimized/experiences/impk-1200w.webp",
+        "sizeBytes": 73654
+      },
+      {
+        "width": 1600,
+        "height": 1067,
+        "path": "/images/optimized/experiences/impk-1600w.webp",
+        "sizeBytes": 103498
+      },
+      {
+        "width": 2048,
+        "height": 1366,
+        "path": "/images/optimized/experiences/impk-2048w.webp",
+        "sizeBytes": 144254
+      }
+    ],
+    "fallbackSrc": "/images/optimized/experiences/impk-2048w.webp"
+  },
+  "experiences/long-march": {
+    "key": "experiences/long-march",
+    "originalFilename": "long-march.jpeg",
+    "category": "experiences",
+    "originalWidth": 7952,
+    "originalHeight": 5304,
+    "outputWidth": 2048,
+    "outputHeight": 1366,
+    "aspectRatio": 1.4992,
+    "originalSizeBytes": 34635776,
+    "avif": [
+      {
+        "width": 480,
+        "height": 320,
+        "path": "/images/optimized/experiences/long-march-480w.avif",
+        "sizeBytes": 80211
+      },
+      {
+        "width": 768,
+        "height": 512,
+        "path": "/images/optimized/experiences/long-march-768w.avif",
+        "sizeBytes": 170646
+      },
+      {
+        "width": 1200,
+        "height": 800,
+        "path": "/images/optimized/experiences/long-march-1200w.avif",
+        "sizeBytes": 332736
+      },
+      {
+        "width": 1600,
+        "height": 1067,
+        "path": "/images/optimized/experiences/long-march-1600w.avif",
+        "sizeBytes": 535836
+      },
+      {
+        "width": 2048,
+        "height": 1366,
+        "path": "/images/optimized/experiences/long-march-2048w.avif",
+        "sizeBytes": 728552
+      }
+    ],
+    "webp": [
+      {
+        "width": 480,
+        "height": 320,
+        "path": "/images/optimized/experiences/long-march-480w.webp",
+        "sizeBytes": 61480
+      },
+      {
+        "width": 768,
+        "height": 512,
+        "path": "/images/optimized/experiences/long-march-768w.webp",
+        "sizeBytes": 133832
+      },
+      {
+        "width": 1200,
+        "height": 800,
+        "path": "/images/optimized/experiences/long-march-1200w.webp",
+        "sizeBytes": 279700
+      },
+      {
+        "width": 1600,
+        "height": 1067,
+        "path": "/images/optimized/experiences/long-march-1600w.webp",
+        "sizeBytes": 445346
+      },
+      {
+        "width": 2048,
+        "height": 1366,
+        "path": "/images/optimized/experiences/long-march-2048w.webp",
+        "sizeBytes": 628300
+      }
+    ],
+    "fallbackSrc": "/images/optimized/experiences/long-march-2048w.webp"
+  },
+  "experiences/rescue-korban": {
+    "key": "experiences/rescue-korban",
+    "originalFilename": "rescue-korban.jpeg",
+    "category": "experiences",
+    "originalWidth": 7952,
+    "originalHeight": 5304,
+    "outputWidth": 2048,
+    "outputHeight": 1366,
+    "aspectRatio": 1.4992,
+    "originalSizeBytes": 26738688,
+    "avif": [
+      {
+        "width": 480,
+        "height": 320,
+        "path": "/images/optimized/experiences/rescue-korban-480w.avif",
+        "sizeBytes": 49297
+      },
+      {
+        "width": 768,
+        "height": 512,
+        "path": "/images/optimized/experiences/rescue-korban-768w.avif",
+        "sizeBytes": 100403
+      },
+      {
+        "width": 1200,
+        "height": 800,
+        "path": "/images/optimized/experiences/rescue-korban-1200w.avif",
+        "sizeBytes": 192519
+      },
+      {
+        "width": 1600,
+        "height": 1067,
+        "path": "/images/optimized/experiences/rescue-korban-1600w.avif",
+        "sizeBytes": 293402
+      },
+      {
+        "width": 2048,
+        "height": 1366,
+        "path": "/images/optimized/experiences/rescue-korban-2048w.avif",
+        "sizeBytes": 401943
+      }
+    ],
+    "webp": [
+      {
+        "width": 480,
+        "height": 320,
+        "path": "/images/optimized/experiences/rescue-korban-480w.webp",
+        "sizeBytes": 40256
+      },
+      {
+        "width": 768,
+        "height": 512,
+        "path": "/images/optimized/experiences/rescue-korban-768w.webp",
+        "sizeBytes": 83796
+      },
+      {
+        "width": 1200,
+        "height": 800,
+        "path": "/images/optimized/experiences/rescue-korban-1200w.webp",
+        "sizeBytes": 171160
+      },
+      {
+        "width": 1600,
+        "height": 1067,
+        "path": "/images/optimized/experiences/rescue-korban-1600w.webp",
+        "sizeBytes": 270388
+      },
+      {
+        "width": 2048,
+        "height": 1366,
+        "path": "/images/optimized/experiences/rescue-korban-2048w.webp",
+        "sizeBytes": 374800
+      }
+    ],
+    "fallbackSrc": "/images/optimized/experiences/rescue-korban-2048w.webp"
+  },
+  "experiences/rescue": {
+    "key": "experiences/rescue",
+    "originalFilename": "rescue.jpeg",
+    "category": "experiences",
+    "originalWidth": 7952,
+    "originalHeight": 5304,
+    "outputWidth": 2048,
+    "outputHeight": 1366,
+    "aspectRatio": 1.4992,
+    "originalSizeBytes": 24477696,
+    "avif": [
+      {
+        "width": 480,
+        "height": 320,
+        "path": "/images/optimized/experiences/rescue-480w.avif",
+        "sizeBytes": 21318
+      },
+      {
+        "width": 768,
+        "height": 512,
+        "path": "/images/optimized/experiences/rescue-768w.avif",
+        "sizeBytes": 37866
+      },
+      {
+        "width": 1200,
+        "height": 800,
+        "path": "/images/optimized/experiences/rescue-1200w.avif",
+        "sizeBytes": 67143
+      },
+      {
+        "width": 1600,
+        "height": 1067,
+        "path": "/images/optimized/experiences/rescue-1600w.avif",
+        "sizeBytes": 98447
+      },
+      {
+        "width": 2048,
+        "height": 1366,
+        "path": "/images/optimized/experiences/rescue-2048w.avif",
+        "sizeBytes": 134688
+      }
+    ],
+    "webp": [
+      {
+        "width": 480,
+        "height": 320,
+        "path": "/images/optimized/experiences/rescue-480w.webp",
+        "sizeBytes": 19254
+      },
+      {
+        "width": 768,
+        "height": 512,
+        "path": "/images/optimized/experiences/rescue-768w.webp",
+        "sizeBytes": 35940
+      },
+      {
+        "width": 1200,
+        "height": 800,
+        "path": "/images/optimized/experiences/rescue-1200w.webp",
+        "sizeBytes": 69978
+      },
+      {
+        "width": 1600,
+        "height": 1067,
+        "path": "/images/optimized/experiences/rescue-1600w.webp",
+        "sizeBytes": 104382
+      },
+      {
+        "width": 2048,
+        "height": 1366,
+        "path": "/images/optimized/experiences/rescue-2048w.webp",
+        "sizeBytes": 147468
+      }
+    ],
+    "fallbackSrc": "/images/optimized/experiences/rescue-2048w.webp"
+  },
+  "photography/greenery": {
+    "key": "photography/greenery",
+    "originalFilename": "greenery.jpeg",
+    "category": "photography",
+    "originalWidth": 7952,
+    "originalHeight": 5304,
+    "outputWidth": 2048,
+    "outputHeight": 1366,
+    "aspectRatio": 1.4992,
+    "originalSizeBytes": 20480000,
+    "avif": [
+      {
+        "width": 480,
+        "height": 320,
+        "path": "/images/optimized/photography/greenery-480w.avif",
+        "sizeBytes": 24041
+      },
+      {
+        "width": 768,
+        "height": 512,
+        "path": "/images/optimized/photography/greenery-768w.avif",
+        "sizeBytes": 40879
+      },
+      {
+        "width": 1200,
+        "height": 800,
+        "path": "/images/optimized/photography/greenery-1200w.avif",
+        "sizeBytes": 67350
+      },
+      {
+        "width": 1600,
+        "height": 1067,
+        "path": "/images/optimized/photography/greenery-1600w.avif",
+        "sizeBytes": 92935
+      },
+      {
+        "width": 2048,
+        "height": 1366,
+        "path": "/images/optimized/photography/greenery-2048w.avif",
+        "sizeBytes": 119204
+      }
+    ],
+    "webp": [
+      {
+        "width": 480,
+        "height": 320,
+        "path": "/images/optimized/photography/greenery-480w.webp",
+        "sizeBytes": 22616
+      },
+      {
+        "width": 768,
+        "height": 512,
+        "path": "/images/optimized/photography/greenery-768w.webp",
+        "sizeBytes": 42174
+      },
+      {
+        "width": 1200,
+        "height": 800,
+        "path": "/images/optimized/photography/greenery-1200w.webp",
+        "sizeBytes": 73218
+      },
+      {
+        "width": 1600,
+        "height": 1067,
+        "path": "/images/optimized/photography/greenery-1600w.webp",
+        "sizeBytes": 107232
+      },
+      {
+        "width": 2048,
+        "height": 1366,
+        "path": "/images/optimized/photography/greenery-2048w.webp",
+        "sizeBytes": 143012
+      }
+    ],
+    "fallbackSrc": "/images/optimized/photography/greenery-2048w.webp"
+  },
+  "photography/scenery": {
+    "key": "photography/scenery",
+    "originalFilename": "scenery.jpeg",
+    "category": "photography",
+    "originalWidth": 7952,
+    "originalHeight": 5304,
+    "outputWidth": 2048,
+    "outputHeight": 1366,
+    "aspectRatio": 1.4992,
+    "originalSizeBytes": 20676608,
+    "avif": [
+      {
+        "width": 480,
+        "height": 320,
+        "path": "/images/optimized/photography/scenery-480w.avif",
+        "sizeBytes": 4016
+      },
+      {
+        "width": 768,
+        "height": 512,
+        "path": "/images/optimized/photography/scenery-768w.avif",
+        "sizeBytes": 8878
+      },
+      {
+        "width": 1200,
+        "height": 800,
+        "path": "/images/optimized/photography/scenery-1200w.avif",
+        "sizeBytes": 19659
+      },
+      {
+        "width": 1600,
+        "height": 1067,
+        "path": "/images/optimized/photography/scenery-1600w.avif",
+        "sizeBytes": 33095
+      },
+      {
+        "width": 2048,
+        "height": 1366,
+        "path": "/images/optimized/photography/scenery-2048w.avif",
+        "sizeBytes": 49240
+      }
+    ],
+    "webp": [
+      {
+        "width": 480,
+        "height": 320,
+        "path": "/images/optimized/photography/scenery-480w.webp",
+        "sizeBytes": 4780
+      },
+      {
+        "width": 768,
+        "height": 512,
+        "path": "/images/optimized/photography/scenery-768w.webp",
+        "sizeBytes": 10402
+      },
+      {
+        "width": 1200,
+        "height": 800,
+        "path": "/images/optimized/photography/scenery-1200w.webp",
+        "sizeBytes": 23212
+      },
+      {
+        "width": 1600,
+        "height": 1067,
+        "path": "/images/optimized/photography/scenery-1600w.webp",
+        "sizeBytes": 39540
+      },
+      {
+        "width": 2048,
+        "height": 1366,
+        "path": "/images/optimized/photography/scenery-2048w.webp",
+        "sizeBytes": 59888
+      }
+    ],
+    "fallbackSrc": "/images/optimized/photography/scenery-2048w.webp"
+  },
+  "photography/spider-web": {
+    "key": "photography/spider-web",
+    "originalFilename": "spider-web.jpeg",
+    "category": "photography",
+    "originalWidth": 7952,
+    "originalHeight": 5304,
+    "outputWidth": 2048,
+    "outputHeight": 1366,
+    "aspectRatio": 1.4992,
+    "originalSizeBytes": 25460736,
+    "avif": [
+      {
+        "width": 480,
+        "height": 320,
+        "path": "/images/optimized/photography/spider-web-480w.avif",
+        "sizeBytes": 10334
+      },
+      {
+        "width": 768,
+        "height": 512,
+        "path": "/images/optimized/photography/spider-web-768w.avif",
+        "sizeBytes": 21917
+      },
+      {
+        "width": 1200,
+        "height": 800,
+        "path": "/images/optimized/photography/spider-web-1200w.avif",
+        "sizeBytes": 44738
+      },
+      {
+        "width": 1600,
+        "height": 1067,
+        "path": "/images/optimized/photography/spider-web-1600w.avif",
+        "sizeBytes": 71457
+      },
+      {
+        "width": 2048,
+        "height": 1366,
+        "path": "/images/optimized/photography/spider-web-2048w.avif",
+        "sizeBytes": 104579
+      }
+    ],
+    "webp": [
+      {
+        "width": 480,
+        "height": 320,
+        "path": "/images/optimized/photography/spider-web-480w.webp",
+        "sizeBytes": 10592
+      },
+      {
+        "width": 768,
+        "height": 512,
+        "path": "/images/optimized/photography/spider-web-768w.webp",
+        "sizeBytes": 22382
+      },
+      {
+        "width": 1200,
+        "height": 800,
+        "path": "/images/optimized/photography/spider-web-1200w.webp",
+        "sizeBytes": 47312
+      },
+      {
+        "width": 1600,
+        "height": 1067,
+        "path": "/images/optimized/photography/spider-web-1600w.webp",
+        "sizeBytes": 77188
+      },
+      {
+        "width": 2048,
+        "height": 1366,
+        "path": "/images/optimized/photography/spider-web-2048w.webp",
+        "sizeBytes": 115884
+      }
+    ],
+    "fallbackSrc": "/images/optimized/photography/spider-web-2048w.webp"
+  },
+  "profile/profile": {
+    "key": "profile/profile",
+    "originalFilename": "profile.png",
+    "category": "profile",
+    "originalWidth": 1086,
+    "originalHeight": 1448,
+    "outputWidth": 1086,
+    "outputHeight": 1448,
+    "aspectRatio": 0.75,
+    "originalSizeBytes": 1333365,
+    "avif": [
+      {
+        "width": 480,
+        "height": 640,
+        "path": "/images/optimized/profile/profile-480w.avif",
+        "sizeBytes": 8457
+      },
+      {
+        "width": 768,
+        "height": 1024,
+        "path": "/images/optimized/profile/profile-768w.avif",
+        "sizeBytes": 17899
+      },
+      {
+        "width": 1086,
+        "height": 1448,
+        "path": "/images/optimized/profile/profile-1086w.avif",
+        "sizeBytes": 27936
+      }
+    ],
+    "webp": [
+      {
+        "width": 480,
+        "height": 640,
+        "path": "/images/optimized/profile/profile-480w.webp",
+        "sizeBytes": 8760
+      },
+      {
+        "width": 768,
+        "height": 1024,
+        "path": "/images/optimized/profile/profile-768w.webp",
+        "sizeBytes": 19124
+      },
+      {
+        "width": 1086,
+        "height": 1448,
+        "path": "/images/optimized/profile/profile-1086w.webp",
+        "sizeBytes": 31958
+      }
+    ],
+    "fallbackSrc": "/images/optimized/profile/profile-1086w.webp"
+  },
+  "projects/bioloop-ax/thumbnail": {
+    "key": "projects/bioloop-ax/thumbnail",
+    "originalFilename": "thumbnail.jpg",
+    "category": "projects",
+    "originalWidth": 2752,
+    "originalHeight": 1536,
+    "outputWidth": 2048,
+    "outputHeight": 1143,
+    "aspectRatio": 1.7917,
+    "originalSizeBytes": 1157875,
+    "avif": [
+      {
+        "width": 480,
+        "height": 268,
+        "path": "/images/optimized/projects/bioloop-ax/thumbnail-480w.avif",
+        "sizeBytes": 3396
+      },
+      {
+        "width": 768,
+        "height": 429,
+        "path": "/images/optimized/projects/bioloop-ax/thumbnail-768w.avif",
+        "sizeBytes": 5199
+      },
+      {
+        "width": 1200,
+        "height": 670,
+        "path": "/images/optimized/projects/bioloop-ax/thumbnail-1200w.avif",
+        "sizeBytes": 8075
+      },
+      {
+        "width": 1600,
+        "height": 893,
+        "path": "/images/optimized/projects/bioloop-ax/thumbnail-1600w.avif",
+        "sizeBytes": 10515
+      },
+      {
+        "width": 2048,
+        "height": 1143,
+        "path": "/images/optimized/projects/bioloop-ax/thumbnail-2048w.avif",
+        "sizeBytes": 13290
+      }
+    ],
+    "webp": [
+      {
+        "width": 480,
+        "height": 268,
+        "path": "/images/optimized/projects/bioloop-ax/thumbnail-480w.webp",
+        "sizeBytes": 4360
+      },
+      {
+        "width": 768,
+        "height": 429,
+        "path": "/images/optimized/projects/bioloop-ax/thumbnail-768w.webp",
+        "sizeBytes": 7176
+      },
+      {
+        "width": 1200,
+        "height": 670,
+        "path": "/images/optimized/projects/bioloop-ax/thumbnail-1200w.webp",
+        "sizeBytes": 12616
+      },
+      {
+        "width": 1600,
+        "height": 893,
+        "path": "/images/optimized/projects/bioloop-ax/thumbnail-1600w.webp",
+        "sizeBytes": 18744
+      },
+      {
+        "width": 2048,
+        "height": 1143,
+        "path": "/images/optimized/projects/bioloop-ax/thumbnail-2048w.webp",
+        "sizeBytes": 26102
+      }
+    ],
+    "fallbackSrc": "/images/optimized/projects/bioloop-ax/thumbnail-2048w.webp"
+  },
+  "projects/gi-presensi/thumbnail": {
+    "key": "projects/gi-presensi/thumbnail",
+    "originalFilename": "thumbnail.jpg",
+    "category": "projects",
+    "originalWidth": 2752,
+    "originalHeight": 1536,
+    "outputWidth": 2048,
+    "outputHeight": 1143,
+    "aspectRatio": 1.7917,
+    "originalSizeBytes": 1333196,
+    "avif": [
+      {
+        "width": 480,
+        "height": 268,
+        "path": "/images/optimized/projects/gi-presensi/thumbnail-480w.avif",
+        "sizeBytes": 5279
+      },
+      {
+        "width": 768,
+        "height": 429,
+        "path": "/images/optimized/projects/gi-presensi/thumbnail-768w.avif",
+        "sizeBytes": 8612
+      },
+      {
+        "width": 1200,
+        "height": 670,
+        "path": "/images/optimized/projects/gi-presensi/thumbnail-1200w.avif",
+        "sizeBytes": 12836
+      },
+      {
+        "width": 1600,
+        "height": 893,
+        "path": "/images/optimized/projects/gi-presensi/thumbnail-1600w.avif",
+        "sizeBytes": 16477
+      },
+      {
+        "width": 2048,
+        "height": 1143,
+        "path": "/images/optimized/projects/gi-presensi/thumbnail-2048w.avif",
+        "sizeBytes": 19854
+      }
+    ],
+    "webp": [
+      {
+        "width": 480,
+        "height": 268,
+        "path": "/images/optimized/projects/gi-presensi/thumbnail-480w.webp",
+        "sizeBytes": 6424
+      },
+      {
+        "width": 768,
+        "height": 429,
+        "path": "/images/optimized/projects/gi-presensi/thumbnail-768w.webp",
+        "sizeBytes": 11190
+      },
+      {
+        "width": 1200,
+        "height": 670,
+        "path": "/images/optimized/projects/gi-presensi/thumbnail-1200w.webp",
+        "sizeBytes": 18028
+      },
+      {
+        "width": 1600,
+        "height": 893,
+        "path": "/images/optimized/projects/gi-presensi/thumbnail-1600w.webp",
+        "sizeBytes": 25546
+      },
+      {
+        "width": 2048,
+        "height": 1143,
+        "path": "/images/optimized/projects/gi-presensi/thumbnail-2048w.webp",
+        "sizeBytes": 34274
+      }
+    ],
+    "fallbackSrc": "/images/optimized/projects/gi-presensi/thumbnail-2048w.webp"
+  },
+  "projects/marbotfx/thumbnail": {
+    "key": "projects/marbotfx/thumbnail",
+    "originalFilename": "thumbnail.jpg",
+    "category": "projects",
+    "originalWidth": 2752,
+    "originalHeight": 1536,
+    "outputWidth": 2048,
+    "outputHeight": 1143,
+    "aspectRatio": 1.7917,
+    "originalSizeBytes": 1213626,
+    "avif": [
+      {
+        "width": 480,
+        "height": 268,
+        "path": "/images/optimized/projects/marbotfx/thumbnail-480w.avif",
+        "sizeBytes": 2936
+      },
+      {
+        "width": 768,
+        "height": 429,
+        "path": "/images/optimized/projects/marbotfx/thumbnail-768w.avif",
+        "sizeBytes": 4500
+      },
+      {
+        "width": 1200,
+        "height": 670,
+        "path": "/images/optimized/projects/marbotfx/thumbnail-1200w.avif",
+        "sizeBytes": 6965
+      },
+      {
+        "width": 1600,
+        "height": 893,
+        "path": "/images/optimized/projects/marbotfx/thumbnail-1600w.avif",
+        "sizeBytes": 8852
+      },
+      {
+        "width": 2048,
+        "height": 1143,
+        "path": "/images/optimized/projects/marbotfx/thumbnail-2048w.avif",
+        "sizeBytes": 11680
+      }
+    ],
+    "webp": [
+      {
+        "width": 480,
+        "height": 268,
+        "path": "/images/optimized/projects/marbotfx/thumbnail-480w.webp",
+        "sizeBytes": 3444
+      },
+      {
+        "width": 768,
+        "height": 429,
+        "path": "/images/optimized/projects/marbotfx/thumbnail-768w.webp",
+        "sizeBytes": 5712
+      },
+      {
+        "width": 1200,
+        "height": 670,
+        "path": "/images/optimized/projects/marbotfx/thumbnail-1200w.webp",
+        "sizeBytes": 9640
+      },
+      {
+        "width": 1600,
+        "height": 893,
+        "path": "/images/optimized/projects/marbotfx/thumbnail-1600w.webp",
+        "sizeBytes": 13286
+      },
+      {
+        "width": 2048,
+        "height": 1143,
+        "path": "/images/optimized/projects/marbotfx/thumbnail-2048w.webp",
+        "sizeBytes": 19000
+      }
+    ],
+    "fallbackSrc": "/images/optimized/projects/marbotfx/thumbnail-2048w.webp"
+  },
+  "projects/panenin/thumbnail": {
+    "key": "projects/panenin/thumbnail",
+    "originalFilename": "thumbnail.png",
+    "category": "projects",
+    "originalWidth": 500,
+    "originalHeight": 272,
+    "outputWidth": 500,
+    "outputHeight": 272,
+    "aspectRatio": 1.8382,
+    "originalSizeBytes": 34204,
+    "avif": [
+      {
+        "width": 480,
+        "height": 261,
+        "path": "/images/optimized/projects/panenin/thumbnail-480w.avif",
+        "sizeBytes": 8309
+      },
+      {
+        "width": 500,
+        "height": 272,
+        "path": "/images/optimized/projects/panenin/thumbnail-500w.avif",
+        "sizeBytes": 7668
+      }
+    ],
+    "webp": [
+      {
+        "width": 480,
+        "height": 261,
+        "path": "/images/optimized/projects/panenin/thumbnail-480w.webp",
+        "sizeBytes": 6654
+      },
+      {
+        "width": 500,
+        "height": 272,
+        "path": "/images/optimized/projects/panenin/thumbnail-500w.webp",
+        "sizeBytes": 7092
+      }
+    ],
+    "fallbackSrc": "/images/optimized/projects/panenin/thumbnail-500w.webp"
+  },
+  "projects/simonika/thumbnail": {
+    "key": "projects/simonika/thumbnail",
+    "originalFilename": "thumbnail.jpg",
+    "category": "projects",
+    "originalWidth": 2752,
+    "originalHeight": 1536,
+    "outputWidth": 2048,
+    "outputHeight": 1143,
+    "aspectRatio": 1.7917,
+    "originalSizeBytes": 1160174,
+    "avif": [
+      {
+        "width": 480,
+        "height": 268,
+        "path": "/images/optimized/projects/simonika/thumbnail-480w.avif",
+        "sizeBytes": 6848
+      },
+      {
+        "width": 768,
+        "height": 429,
+        "path": "/images/optimized/projects/simonika/thumbnail-768w.avif",
+        "sizeBytes": 11842
+      },
+      {
+        "width": 1200,
+        "height": 670,
+        "path": "/images/optimized/projects/simonika/thumbnail-1200w.avif",
+        "sizeBytes": 19988
+      },
+      {
+        "width": 1600,
+        "height": 893,
+        "path": "/images/optimized/projects/simonika/thumbnail-1600w.avif",
+        "sizeBytes": 27201
+      },
+      {
+        "width": 2048,
+        "height": 1143,
+        "path": "/images/optimized/projects/simonika/thumbnail-2048w.avif",
+        "sizeBytes": 34973
+      }
+    ],
+    "webp": [
+      {
+        "width": 480,
+        "height": 268,
+        "path": "/images/optimized/projects/simonika/thumbnail-480w.webp",
+        "sizeBytes": 7050
+      },
+      {
+        "width": 768,
+        "height": 429,
+        "path": "/images/optimized/projects/simonika/thumbnail-768w.webp",
+        "sizeBytes": 13042
+      },
+      {
+        "width": 1200,
+        "height": 670,
+        "path": "/images/optimized/projects/simonika/thumbnail-1200w.webp",
+        "sizeBytes": 23926
+      },
+      {
+        "width": 1600,
+        "height": 893,
+        "path": "/images/optimized/projects/simonika/thumbnail-1600w.webp",
+        "sizeBytes": 34616
+      },
+      {
+        "width": 2048,
+        "height": 1143,
+        "path": "/images/optimized/projects/simonika/thumbnail-2048w.webp",
+        "sizeBytes": 48362
+      }
+    ],
+    "fallbackSrc": "/images/optimized/projects/simonika/thumbnail-2048w.webp"
+  }
+}
+
+
+
+================================================================
+FILE: D:\OLER\COOLYEAH DEK\Portofolio\oler\aurell-portfolio\src\types\portfolio.ts
+================================================================
+export interface ImageVariant {
+  width: number;
+  height: number;
+  path: string;
+  sizeBytes: number;
+}
+
+export interface ManifestEntry {
+  key: string;
+  originalFilename: string;
+  category: string;
+  originalWidth: number;
+  originalHeight: number;
+  outputWidth: number;
+  outputHeight: number;
+  aspectRatio: number;
+  originalSizeBytes: number;
+  avif: ImageVariant[];
+  webp: ImageVariant[];
+  fallbackSrc: string;
+}
+
+export interface ProfileData {
+  fullName: string;
+  monogram: string;
+  professionalIdentity: string;
+  academicIdentity: string;
+  institution: string;
+  location: string;
+  enrollmentYear: number;
+  focus: string;
+  heroHeadline: string;
+  heroSubheadline: string;
+  shortIntroduction: string;
+  profileImageKey?: string | null;
+  cvUrl?: string | null;
+  aboutSections: {
+    personalIntroduction: string[];
+    educationalBackground: string[];
+    technicalInterests: string[];
+    professionalInterests: string[];
+    workingApproach: string[];
+    careerDirection: string[];
+  };
+}
+
+export interface ProjectItem {
+  slug: string;
+  title: string;
+  category: "System Design & Project Management" |"Backend & Web System" | "AI & Mobile App" | "API & Automation" | "Backend Development & API" |"Backend & AI Development" |"Other";
+  typeLabel?: string;
+  role: string;
+  period: string;
+  description: string;
+  overview?: string;
+  background?: string;
+  solution?: string;
+  responsibilities: string[];
+  technologies: {
+    personalContribution: string[];
+    teamOrContext?: string[];
+  };
+  developmentProcess?: string[];
+  challengesAndSolutions?: {
+    challenge: string;
+    solution: string;
+  }[];
+  status?: string;
+  resultOrStatus?: string;
+  thumbnail?: string | null;
+  gallery: {
+    imageKey: string;
+    alt: string;
+    caption?: string;
+  }[];
+  featured: boolean;
+  githubUrl?: string | null;
+  repositoryNote?: string;
+  liveUrl?: string | null;
+  isTeamCollaboration?: boolean;
+  collaborationNote?: string;
+}
+
+export interface ExperienceItem {
+  slug: string;
+  organization: string;
+  programName?: string;
+  position: string;
+  additionalPositions?: string[];
+  category: "organizational" | "committee";
+  period: string;
+  startDate?: string;
+  endDate?: string;
+  isCurrent: boolean;
+  description: string;
+  responsibilities: string[];
+  contributions?: string[];
+  featured: boolean;
+  images: {
+    imageKey: string;
+    alt: string;
+    caption?: string;
+  }[];
+  externalLinks?: {
+    label: string;
+    url: string;
+  }[];
+}
+
+export interface PhotoItem {
+  imageKey: string;
+  alt: string;
+  caption?: string;
+  date?: string;
+  location?: string;
+}
+
+export interface PhotographyAlbum {
+  slug: string;
+  title: string;
+  category:
+    | "Outdoor & Nature"
+    | "Mountain Activities"
+    | "Event Documentation"
+    | "Organizational Activities"
+    | "Travel";
+  description: string;
+  date?: string;
+  location?: string;
+  coverImageKey?: string | null;
+  images: PhotoItem[];
+  featured: boolean;
+  tags: string[];
+}
+
+export interface SocialMediaWork {
+  slug: string;
+  title: string;
+  campaignOrEvent: string;
+  description: string;
+  period: string;
+  coverImageKey?: string | null;
+  images: {
+    imageKey: string;
+    alt: string;
+    caption?: string;
+  }[];
+  contentType: "Single Feed" | "Carousel Feed" | "Story & Publication" | "Visual Documentation";
+  caption?: string;
+  roleAndContribution: string;
+  ownershipType: "Individual Work" | "Team Collaboration";
+  featured: boolean;
+}
+
+export interface SkillGroup {
+  category: string;
+  description: string;
+  skills: string[];
+}
+
+export interface EducationItem {
+  degree: string;
+  institution: string;
+  period: string;
+  description?: string;
+}
+
+export interface CertificationItem {
+  title: string;
+  issuer: string;
+  year?: string;
+  credentialNote?: string;
+}
+
+export interface LanguageTestItem {
+  testName: string;
+  organizer: string;
+  score: string;
+  year?: string;
+}
+
+export interface SocialLinkItem {
+  platform: "GitHub" | "LinkedIn" | "Instagram" | "Email";
+  label: string;
+  url: string;
+  usernameOrAddress: string;
+}
+
+
+
+================================================================
+FILE: D:\OLER\COOLYEAH DEK\Portofolio\oler\aurell-portfolio\AGENTS.md
+================================================================
+<!-- BEGIN:nextjs-agent-rules -->
+
+## This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->
+
+
+
+
+================================================================
+FILE: D:\OLER\COOLYEAH DEK\Portofolio\oler\aurell-portfolio\eslint.config.mjs
+================================================================
+import { defineConfig, globalIgnores } from "eslint/config";
+import nextVitals from "eslint-config-next/core-web-vitals";
+import nextTs from "eslint-config-next/typescript";
+
+const eslintConfig = defineConfig([
+  ...nextVitals,
+  ...nextTs,
+  // Override default ignores of eslint-config-next.
+  globalIgnores([
+    // Default ignores of eslint-config-next:
+    ".next/**",
+    "out/**",
+    "build/**",
+    "next-env.d.ts",
+  ]),
+]);
+
+export default eslintConfig;
+
+
+
+
+================================================================
+FILE: D:\OLER\COOLYEAH DEK\Portofolio\oler\aurell-portfolio\next-env.d.ts
+================================================================
+/// <reference types="next" />
+/// <reference types="next/image-types/global" />
+/// <reference path="./.next/types/routes.d.ts" />
+
+// NOTE: This file should not be edited
+// see https://nextjs.org/docs/app/api-reference/config/typescript for more information.
+
+
+
+
+================================================================
+FILE: D:\OLER\COOLYEAH DEK\Portofolio\oler\aurell-portfolio\next.config.ts
+================================================================
+import type { NextConfig } from "next";
+
+const nextConfig: NextConfig = {
+  output: "export",
+  images: {
+    unoptimized: true, // Kita menggunakan komponen <ResponsiveImage> berbasis Sharp & <picture>
+  },
+  trailingSlash: false,
+  reactStrictMode: true,
+};
+
+export default nextConfig;
+
+
+
+================================================================
+FILE: D:\OLER\COOLYEAH DEK\Portofolio\oler\aurell-portfolio\package.json
+================================================================
+{
+  "name": "aurell-portfolio",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "images:optimize": "node scripts/optimize-images.mjs",
+    "prebuild": "node scripts/optimize-images.mjs",
+    "build": "next build",
+    "typecheck": "tsc --noEmit",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "lucide-react": "^1.16.0",
+    "next": "^15.2.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.4",
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "eslint": "^9.0.0",
+    "eslint-config-next": "^15.2.0",
+    "postcss": "^8.5.32",
+    "sharp": "^0.33.5",
+    "tailwindcss": "^4.3.4",
+    "typescript": "^5.7.0"
+  }
+}
+
+
+
+
+================================================================
+FILE: D:\OLER\COOLYEAH DEK\Portofolio\oler\aurell-portfolio\postcss.config.mjs
+================================================================
+const config = {
+  plugins: {
+    "@tailwindcss/postcss": {},
+  },
+};
+
+export default config;
+
+
+
+================================================================
+FILE: D:\OLER\COOLYEAH DEK\Portofolio\oler\aurell-portfolio\README.md
+================================================================
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+
+## Getting Started
+
+First, run the development server:
+
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+
+## Learn More
+
+To learn more about Next.js, take a look at the following resources:
+
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+
+## Deploy on Vercel
+
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+
+
+
+================================================================
+FILE: D:\OLER\COOLYEAH DEK\Portofolio\oler\aurell-portfolio\tsconfig.json
+================================================================
+{
+  "compilerOptions": {
+    "target": "ES2017",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ]
+    }
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts",
+    "**/*.mts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}
+
+
+
+
